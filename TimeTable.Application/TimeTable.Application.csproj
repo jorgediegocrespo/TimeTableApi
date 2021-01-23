@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Polly" Version="7.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TimeTable.Application.Contracts\TimeTable.Application.Contracts.csproj" />
+    <ProjectReference Include="..\TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

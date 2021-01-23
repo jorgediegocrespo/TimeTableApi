@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 DistributedServices", "1 DistributedServices", "{F935FD16-9C9F-47BC-9E63-718DD1986BC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 Application", "2 Application", "{EAEBA547-612C-4D8E-8DEE-F1287CAEAAA3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 Business", "3 Business", "{427B430D-0E5A-4F35-B725-FE9C055F6B0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 DataAccess", "4 DataAccess", "{C5461E3D-1AB2-4D22-BDC1-8A6606B19575}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 CrossCutting", "5 CrossCutting", "{9CCC7699-EC4D-4291-A3FB-11CEA9D8FD7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.Api", "TimeTable.Api\TimeTable.Api.csproj", "{1C05CC68-0313-4034-9E83-0AF4EBB52461}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.Application", "TimeTable.Application\TimeTable.Application.csproj", "{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.Application.Contracts", "TimeTable.Application.Contracts\TimeTable.Application.Contracts.csproj", "{336CB40E-D12E-43D0-AE81-2D88F2F56A96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.DataAccess.Contracts", "TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj", "{5B1000A3-1563-477F-99A5-74EDC7218728}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.DataAccess", "TimeTable.DataAccess\TimeTable.DataAccess.csproj", "{39909CB7-5AD8-4A62-9395-436D8ABA921B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.Business", "TimeTable.Business\TimeTable.Business.csproj", "{33DB23B6-F6FE-4206-BA55-4D47EB92CE38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTable.CrossCutting", "TimeTable.CrossCutting\TimeTable.CrossCutting.csproj", "{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C05CC68-0313-4034-9E83-0AF4EBB52461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C05CC68-0313-4034-9E83-0AF4EBB52461}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C05CC68-0313-4034-9E83-0AF4EBB52461}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C05CC68-0313-4034-9E83-0AF4EBB52461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{336CB40E-D12E-43D0-AE81-2D88F2F56A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{336CB40E-D12E-43D0-AE81-2D88F2F56A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{336CB40E-D12E-43D0-AE81-2D88F2F56A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{336CB40E-D12E-43D0-AE81-2D88F2F56A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B1000A3-1563-477F-99A5-74EDC7218728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1000A3-1563-477F-99A5-74EDC7218728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1000A3-1563-477F-99A5-74EDC7218728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1000A3-1563-477F-99A5-74EDC7218728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39909CB7-5AD8-4A62-9395-436D8ABA921B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39909CB7-5AD8-4A62-9395-436D8ABA921B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39909CB7-5AD8-4A62-9395-436D8ABA921B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39909CB7-5AD8-4A62-9395-436D8ABA921B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33DB23B6-F6FE-4206-BA55-4D47EB92CE38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33DB23B6-F6FE-4206-BA55-4D47EB92CE38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33DB23B6-F6FE-4206-BA55-4D47EB92CE38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33DB23B6-F6FE-4206-BA55-4D47EB92CE38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C05CC68-0313-4034-9E83-0AF4EBB52461} = {F935FD16-9C9F-47BC-9E63-718DD1986BC6}
+		{05A6DAB7-6F22-45D9-9063-0A46D85DBC4D} = {EAEBA547-612C-4D8E-8DEE-F1287CAEAAA3}
+		{336CB40E-D12E-43D0-AE81-2D88F2F56A96} = {EAEBA547-612C-4D8E-8DEE-F1287CAEAAA3}
+		{5B1000A3-1563-477F-99A5-74EDC7218728} = {C5461E3D-1AB2-4D22-BDC1-8A6606B19575}
+		{39909CB7-5AD8-4A62-9395-436D8ABA921B} = {C5461E3D-1AB2-4D22-BDC1-8A6606B19575}
+		{33DB23B6-F6FE-4206-BA55-4D47EB92CE38} = {427B430D-0E5A-4F35-B725-FE9C055F6B0B}
+		{B21E2F19-5F2B-4C46-918F-78DEDB5CCCAA} = {9CCC7699-EC4D-4291-A3FB-11CEA9D8FD7B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89416D48-912C-424D-B25B-823B8B9EC59A}
+	EndGlobalSection
+EndGlobal
