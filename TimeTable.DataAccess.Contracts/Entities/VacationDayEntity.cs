@@ -8,6 +8,7 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public int Year { get; set; }
         public int VacationDays { get; set; }
 
+        public int PersonId { get; set; }
         public PersonEntity Person { get; set; }
     }
 }

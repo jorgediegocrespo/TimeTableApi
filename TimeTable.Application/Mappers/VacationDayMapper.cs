@@ -8,7 +8,12 @@ namespace TimeTable.Application.Mappers
     {
         public VacationDayEntity Map(VacationDay businessModel)
         {
-            return new VacationDayEntity(); //TODO
+            return new VacationDayEntity()
+            {
+                Id = businessModel.Id,
+                Year = businessModel.Year,
+                VacationDays = businessModel.VacationDays,
+            };
         }
 
         public VacationDay Map(VacationDayEntity entity)

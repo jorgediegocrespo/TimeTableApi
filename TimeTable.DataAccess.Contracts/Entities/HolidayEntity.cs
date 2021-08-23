@@ -9,7 +9,10 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public DateTime Date { get; set; }
         public bool Confirmed { get; set; }
 
+        public int PersonRequestingId { get; set; }
         public PersonEntity PersonRequesting { get; set; }
+
+        public int? ConfirmingPersonId { get; set; }
         public PersonEntity ConfirmingPerson { get; set; }
     }
 }

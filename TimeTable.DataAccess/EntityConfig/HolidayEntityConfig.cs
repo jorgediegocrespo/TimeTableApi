@@ -11,13 +11,22 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.ToTable("Holidays");
 
             entityBuilder.HasKey(x => x.Id);
+            entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            entityBuilder.Property(x => x.Id).IsRequired();
             entityBuilder.Property(x => x.Date).IsRequired(true);
             entityBuilder.Property(x => x.Confirmed).IsRequired(true);
 
-            entityBuilder.HasOne(x => x.PersonRequesting).WithMany(x => x.HolidaysRequested);
-            entityBuilder.HasOne(x => x.ConfirmingPerson).WithMany(x => x.ConfirmedHolidays);
+            entityBuilder.HasOne(x => x.PersonRequesting)
+                .WithMany(x => x.HolidaysRequested)
+                .IsRequired(true)
+                .HasForeignKey(x => x.PersonRequestingId)
+                .IsRequired(true);
+
+            entityBuilder.HasOne(x => x.ConfirmingPerson)
+                .WithMany(x => x.ConfirmedHolidays)
+                .IsRequired(false)
+                .HasForeignKey(x => x.ConfirmingPersonId)
+                .IsRequired(false);
         }
     }
 }

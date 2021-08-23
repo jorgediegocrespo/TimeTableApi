@@ -11,11 +11,17 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.ToTable("VacationDays");
 
             entityBuilder.HasKey(x => x.Id);
+            entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            entityBuilder.Property(x => x.Id).IsRequired();
             entityBuilder.Property(x => x.Year).IsRequired(true);
 
-            entityBuilder.HasOne(x => x.Person).WithMany(x => x.VacationDays);
+            entityBuilder.HasIndex(a => a.Year).IsUnique(true);
+
+            entityBuilder.HasOne(x => x.Person)
+                .WithMany(x => x.VacationDays)
+                .IsRequired(true)
+                .HasForeignKey(x => x.PersonId)
+                .IsRequired(true);
         }
     }
 }

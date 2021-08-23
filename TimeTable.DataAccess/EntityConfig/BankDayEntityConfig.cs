@@ -11,11 +11,15 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.ToTable("BankDays");
 
             entityBuilder.HasKey(x => x.Id);
+            entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            entityBuilder.Property(x => x.Id).IsRequired();
             entityBuilder.Property(x => x.Day).IsRequired(true);
 
-            entityBuilder.HasOne(x => x.Company).WithMany(x => x.BankDays);
+            entityBuilder.HasOne(x => x.Company)
+                .WithMany(x => x.BankDays)
+                .IsRequired(true)
+                .HasForeignKey(x => x.CompanyId)
+                .IsRequired(true);
         }
     }
 }

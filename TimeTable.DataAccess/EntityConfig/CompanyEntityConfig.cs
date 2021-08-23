@@ -11,9 +11,11 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.ToTable("Company");
 
             entityBuilder.HasKey(x => x.Id);
-            
-            entityBuilder.Property(x => x.Id).IsRequired();
+            entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
+
             entityBuilder.Property(x => x.Name).IsRequired(true);
+
+            entityBuilder.HasIndex(a => a.Name).IsUnique(true);
 
             entityBuilder.HasMany(x => x.BankDays).WithOne(x => x.Company);
             entityBuilder.HasMany(x => x.People).WithOne(x => x.Company);
