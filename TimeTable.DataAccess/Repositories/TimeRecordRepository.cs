@@ -7,16 +7,16 @@ using TimeTable.DataAccess.Repositories.Base;
 
 namespace TimeTable.DataAccess.Repositories
 {
-    public class VacationDayRepository : BaseRepository<VacationDayEntity>, IVacationDayRepository
+    public class TimeRecordRepository : BaseRepository<TimeRecordEntity>, ITimeRecordRepository
     {
-        protected override DbSet<VacationDayEntity> DbEntity => dbContext.VacationDays;
+        protected override DbSet<TimeRecordEntity> DbEntity => dbContext.TimeRecords;
 
-        public VacationDayRepository(ITimeTableDbContext dbContext) : base(dbContext)
+        public TimeRecordRepository(ITimeTableDbContext dbContext) : base(dbContext)
         { }
 
-        public override async Task<VacationDayEntity> GetAsync(int id)
+        public override async Task<TimeRecordEntity> GetAsync(int id)
         {
-            return await dbContext.VacationDays
+            return await dbContext.TimeRecords
                 .Include(x => x.Person)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }

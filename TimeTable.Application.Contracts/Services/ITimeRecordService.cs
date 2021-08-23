@@ -3,6 +3,6 @@ using TimeTable.Application.Contracts.Services.Base;
 
 namespace TimeTable.Application.Contracts.Services
 {
-    public interface IHolidayService : IBaseCrudService<Holiday>
+    public interface ITimeRecordService : IBaseCrudService<TimeRecord>
     { }
 }

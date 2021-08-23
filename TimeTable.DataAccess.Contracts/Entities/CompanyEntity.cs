@@ -9,6 +9,5 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public string Name { get; set; }
 
         public List<PersonEntity> People { get; set; }
-        public List<BankDayEntity> BankDays { get; set; }
     }
 }

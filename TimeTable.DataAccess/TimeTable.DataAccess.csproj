@@ -20,4 +20,8 @@
     <ProjectReference Include="..\TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

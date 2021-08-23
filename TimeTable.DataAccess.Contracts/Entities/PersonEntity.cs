@@ -12,8 +12,6 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public int CompanyId { get; set; }
         public CompanyEntity Company { get; set; }
 
-        public List<VacationDayEntity> VacationDays { get; set; }
-        public List<HolidayEntity> HolidaysRequested { get; set; }
-        public List<HolidayEntity> ConfirmedHolidays { get; set; }
+        public List<TimeRecordEntity> TimeRecords { get; set; }
     }
 }

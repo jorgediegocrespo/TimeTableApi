@@ -19,26 +19,6 @@ namespace TimeTable.DataAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.BankDayEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Day")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("BankDays");
-                });
-
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -55,35 +35,7 @@ namespace TimeTable.DataAccess.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Company");
-                });
-
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.HolidayEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Confirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ConfirmingPersonId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PersonRequestingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConfirmingPersonId");
-
-                    b.HasIndex("PersonRequestingId");
-
-                    b.ToTable("Holidays");
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
@@ -113,52 +65,27 @@ namespace TimeTable.DataAccess.Migrations
                     b.ToTable("People");
                 });
 
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.VacationDayEntity", b =>
+            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.TimeRecordEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTimeOffset>("EndDateTime")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VacationDays")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
+                    b.Property<DateTimeOffset>("StartDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
 
-                    b.HasIndex("Year")
-                        .IsUnique();
-
-                    b.ToTable("VacationDays");
-                });
-
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.BankDayEntity", b =>
-                {
-                    b.HasOne("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", "Company")
-                        .WithMany("BankDays")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.HolidayEntity", b =>
-                {
-                    b.HasOne("TimeTable.DataAccess.Contracts.Entities.PersonEntity", "ConfirmingPerson")
-                        .WithMany("ConfirmedHolidays")
-                        .HasForeignKey("ConfirmingPersonId");
-
-                    b.HasOne("TimeTable.DataAccess.Contracts.Entities.PersonEntity", "PersonRequesting")
-                        .WithMany("HolidaysRequested")
-                        .HasForeignKey("PersonRequestingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.ToTable("TimeRecords");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
@@ -170,10 +97,10 @@ namespace TimeTable.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.VacationDayEntity", b =>
+            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.TimeRecordEntity", b =>
                 {
                     b.HasOne("TimeTable.DataAccess.Contracts.Entities.PersonEntity", "Person")
-                        .WithMany("VacationDays")
+                        .WithMany("TimeRecords")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -8,10 +8,10 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class HolidayService : BaseService<Holiday, HolidayEntity>, IHolidayService
+    public class TimeRecordService : BaseService<TimeRecord, TimeRecordEntity>, ITimeRecordService
     {
-        public HolidayService(IHolidayRepository repository, IAppConfig appConfig)
-            : base(repository, appConfig, new HolidayMapper())
+        public TimeRecordService(ITimeRecordRepository repository, IAppConfig appConfig)
+            : base(repository, appConfig, new TimeRecordMapper())
         { }
     }
 }

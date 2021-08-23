@@ -20,11 +20,9 @@ namespace TimeTable.CrossCutting.Register
 
         private static void RegisterRepositories(IServiceCollection services)
         {
-            services.AddTransient<IBankDayRepository, BankDayRepository>();
             services.AddTransient<ICompanyRepository, CompanyRepository>();
-            services.AddTransient<IHolidayRepository, HolidayRepository>();
             services.AddTransient<IPersonRepository, PersonRepository>();
-            services.AddTransient<IVacationDayRepository, VacationDayRepository>();
+            services.AddTransient<ITimeRecordRepository, TimeRecordRepository>();
         }
 
         private static void RegisterServices(IServiceCollection services)

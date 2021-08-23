@@ -10,19 +10,15 @@ namespace TimeTable.DataAccess
         public TimeTableDbContext(DbContextOptions options) : base(options) { }
         public TimeTableDbContext() { }
 
-        public DbSet<BankDayEntity> BankDays { get; set; }
         public DbSet<CompanyEntity> Companies { get; set; }
-        public DbSet<HolidayEntity> Holidays { get; set; }
         public DbSet<PersonEntity> People { get; set; }
-        public DbSet<VacationDayEntity> VacationDays { get; set; }
+        public DbSet<TimeRecordEntity> TimeRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CompanyEntityConfig.SetEntityBuilder(modelBuilder.Entity<CompanyEntity>());
             PersonEntityConfig.SetEntityBuilder(modelBuilder.Entity<PersonEntity>());
-            BankDayEntityConfig.SetEntityBuilder(modelBuilder.Entity<BankDayEntity>());            
-            HolidayEntityConfig.SetEntityBuilder(modelBuilder.Entity<HolidayEntity>());            
-            VacationDayEntityConfig.SetEntityBuilder(modelBuilder.Entity<VacationDayEntity>());
+            TimeRecordEntityConfig.SetEntityBuilder(modelBuilder.Entity<TimeRecordEntity>());
 
             base.OnModelCreating(modelBuilder);
         }

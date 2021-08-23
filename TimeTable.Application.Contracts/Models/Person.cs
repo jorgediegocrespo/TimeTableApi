@@ -9,8 +9,6 @@ namespace TimeTable.Application.Contracts.Models
         public string Name { get; set; }
         public bool IsAdmin { get; set; }
         public Company Company { get; set; }
-        public List<VacationDay> VacationDays { get; set; }
-        public List<Holiday> HolidaysRequested { get; set; }
-        public List<Holiday> ConfirmedHolidays { get; set; }
+        public List<TimeRecord> TimeRecords { get; set; }
     }
 }
