@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Models.Base;
+using TimeTable.Application.Contracts.Mappers.Base;
 using TimeTable.Application.Contracts.Services.Base;
-using TimeTable.Application.Mappers.Base;
+using TimeTable.Business.Models.Base;
 using TimeTable.DataAccess.Contracts.Entities.Base;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
 

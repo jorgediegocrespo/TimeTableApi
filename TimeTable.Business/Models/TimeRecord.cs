@@ -1,7 +1,7 @@
 ﻿using System;
-using TimeTable.Application.Contracts.Models.Base;
+using TimeTable.Business.Models.Base;
 
-namespace TimeTable.Application.Contracts.Models
+namespace TimeTable.Business.Models
 {
     public class TimeRecord : IBaseBusinessModel
     {

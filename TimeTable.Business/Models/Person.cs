@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using TimeTable.Application.Contracts.Models.Base;
+using TimeTable.Business.Models.Base;
 
-namespace TimeTable.Application.Contracts.Models
+namespace TimeTable.Business.Models
 {
     public class Person : IBaseBusinessModel
     {

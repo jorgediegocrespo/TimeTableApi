@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TimeTable.Application.Contracts.Services;
+using TimeTable.Application.Services;
 using TimeTable.DataAccess.Contracts.Repositories;
 using TimeTable.DataAccess.Repositories;
 
@@ -26,7 +28,11 @@ namespace TimeTable.CrossCutting.Register
         }
 
         private static void RegisterServices(IServiceCollection services)
-        { }
+        {
+            services.AddTransient<ICompanyService, CompanyService>();
+            services.AddTransient<IPersonService, PersonService>();
+            services.AddTransient<ITimeRecordService, TimeRecordService>();
+        }
 
         private static void RegisterOthers(IServiceCollection services)
         { }

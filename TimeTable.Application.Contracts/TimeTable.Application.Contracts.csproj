@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TimeTable.Business\TimeTable.Business.csproj" />
+    <ProjectReference Include="..\TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

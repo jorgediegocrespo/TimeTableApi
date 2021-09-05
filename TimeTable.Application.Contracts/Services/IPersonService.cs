@@ -1,5 +1,5 @@
-﻿using TimeTable.Application.Contracts.Models;
-using TimeTable.Application.Contracts.Services.Base;
+﻿using TimeTable.Application.Contracts.Services.Base;
+using TimeTable.Business.Models;
 
 namespace TimeTable.Application.Contracts.Services
 {
