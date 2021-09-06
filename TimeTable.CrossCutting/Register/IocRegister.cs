@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TimeTable.Application.Configuration;
+using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Services;
 using TimeTable.DataAccess.Contracts.Repositories;
@@ -35,6 +37,8 @@ namespace TimeTable.CrossCutting.Register
         }
 
         private static void RegisterOthers(IServiceCollection services)
-        { }
+        {
+            services.AddTransient<IAppConfig, AppConfig>();
+        }
     }
 }

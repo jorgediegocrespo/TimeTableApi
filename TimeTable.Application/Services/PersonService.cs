@@ -1,8 +1,8 @@
 ﻿using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Models;
+using TimeTable.Application.Contracts.Mappers;
 using TimeTable.Application.Contracts.Services;
-using TimeTable.Application.Mappers;
 using TimeTable.Application.Services.Base;
+using TimeTable.Business.Models;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories;
 

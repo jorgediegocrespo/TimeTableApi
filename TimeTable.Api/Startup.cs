@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.CrossCutting.Register;
+using Microsoft.OpenApi.Models;
+using TimeTable.Api.Config;
 
 namespace TimeTable.Api
 {
@@ -29,6 +31,7 @@ namespace TimeTable.Api
             IocRegister.RegisterDbContext(services, Configuration.GetConnectionString("DataBaseConnection"));
             IocRegister.AddRegistration(services);
             services.AddControllers();
+            SwaggerConfig.AddRegistration(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,11 +42,12 @@ namespace TimeTable.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            SwaggerConfig.AddRegistration(app);
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
