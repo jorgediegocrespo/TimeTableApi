@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TimeTable.Api.Config;
+using TimeTable.CrossCutting.Middleware;
 using TimeTable.CrossCutting.Register;
 
 namespace TimeTable.Api
@@ -29,6 +24,7 @@ namespace TimeTable.Api
             IocRegister.RegisterDbContext(services, Configuration.GetConnectionString("DataBaseConnection"));
             IocRegister.AddRegistration(services);
             services.AddControllers();
+            SwaggerConfig.AddRegistration(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,12 +35,14 @@ namespace TimeTable.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            SwaggerConfig.AddRegistration(app);
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
+            app.UseLogMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

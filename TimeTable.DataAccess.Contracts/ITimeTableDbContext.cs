@@ -9,9 +9,7 @@ namespace TimeTable.DataAccess.Contracts
     {
         DbSet<CompanyEntity> Companies { get; set; }
         DbSet<PersonEntity> People { get; set; }
-        DbSet<BankDayEntity> BankDays { get; set; }        
-        DbSet<HolidayEntity> Holidays { get; set; }        
-        DbSet<VacationDayEntity> VacationDays { get; set; }
+        DbSet<TimeRecordEntity> TimeRecords { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
     }

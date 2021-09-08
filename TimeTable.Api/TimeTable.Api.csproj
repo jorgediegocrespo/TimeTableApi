@@ -5,18 +5,20 @@
     <UserSecretsId>dd41280d-5e4f-413a-9673-5d89b571a30b</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\PersonalProjects\TimeTableApi\TimeTable.Api\TimeTable.Api.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TimeTable.Business\TimeTable.Business.csproj" />
     <ProjectReference Include="..\TimeTable.CrossCutting\TimeTable.CrossCutting.csproj" />
   </ItemGroup>
 

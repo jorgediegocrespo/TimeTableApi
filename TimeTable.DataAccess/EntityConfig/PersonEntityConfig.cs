@@ -24,9 +24,7 @@ namespace TimeTable.DataAccess.EntityConfig
                 .HasForeignKey(x => x.CompanyId)
                 .IsRequired(true);
 
-            entityBuilder.HasMany(x => x.VacationDays).WithOne(x => x.Person);
-            entityBuilder.HasMany(x => x.HolidaysRequested).WithOne(x => x.PersonRequesting);
-            entityBuilder.HasMany(x => x.ConfirmedHolidays).WithOne(x => x.ConfirmingPerson);
+            entityBuilder.HasMany(x => x.TimeRecords).WithOne(x => x.Person);
         }
     }
 }

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Models.Base;
+using TimeTable.Application.Contracts.Mappers.Base;
 using TimeTable.Application.Contracts.Services.Base;
-using TimeTable.Application.Mappers.Base;
+using TimeTable.Business.Models.Base;
 using TimeTable.DataAccess.Contracts.Entities.Base;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
 
@@ -17,9 +17,9 @@ namespace TimeTable.Application.Services.Base
         where T : IBaseBusinessModel
         where R : class, IBaseWithIdEntity
     {
-        private readonly IRepository<R> repository;
-        private readonly IAppConfig appConfig;
-        private readonly IMapper<T, R> mapper;
+        protected readonly IRepository<R> repository;
+        protected readonly IAppConfig appConfig;
+        protected readonly IMapper<T, R> mapper;
 
         public BaseService(IRepository<R> repository, IAppConfig appConfig, IMapper<T, R> mapper)
         {
@@ -58,6 +58,7 @@ namespace TimeTable.Application.Services.Base
 
         public async Task<T> AddAsync(T entity)
         {
+            await ValidateEntityToAddAsync(entity);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -96,6 +97,11 @@ namespace TimeTable.Application.Services.Base
                     await repository.DeleteAsync(id);
                     return true;
                 });
+        }
+
+        protected virtual Task ValidateEntityToAddAsync(T entity)
+        {
+            return Task.CompletedTask;
         }
     }
 }
