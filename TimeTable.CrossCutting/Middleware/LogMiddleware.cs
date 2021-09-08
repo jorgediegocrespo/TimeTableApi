@@ -34,7 +34,7 @@ namespace TimeTable.CrossCutting.Middleware
 
         private void TraceRequest(string payload, string url, string method)
         {
-            Console.WriteLine($"LOG:{Environment.NewLine}Url => {url}{Environment.NewLine};Body => {payload};{Environment.NewLine}Method => {method}");
+            System.Diagnostics.Debug.WriteLine($"***** LOG:{Environment.NewLine}          Url => {url};{Environment.NewLine}          Body => {payload};{Environment.NewLine}          Method => {method}");
         }
     }
 }
