@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities.Base;
@@ -37,6 +40,8 @@ namespace TimeTable.DataAccess.Repositories.Base
         }
 
         public async Task<bool> ExistsAsync(int id) => await DbEntity.AnyAsync(x => x.Id == id);
+
+        public async Task<bool> ExistsAsync([NotNullAttribute] Expression<Func<T, bool>> expression) => await DbEntity.AnyAsync(expression);
 
         public virtual async Task<T> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
 

@@ -1,18 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TimeTable.CrossCutting.Register;
-using Microsoft.OpenApi.Models;
 using TimeTable.Api.Config;
+using TimeTable.CrossCutting.Middleware;
+using TimeTable.CrossCutting.Register;
 
 namespace TimeTable.Api
 {
@@ -49,6 +42,7 @@ namespace TimeTable.Api
 
             //app.UseAuthorization();
 
+            app.UseLogMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

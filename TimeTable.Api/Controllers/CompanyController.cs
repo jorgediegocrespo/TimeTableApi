@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
@@ -15,15 +16,21 @@ namespace TimeTable.Api.Controllers
         public CompanyController(ICompanyService service, IAppConfig config) : base(service, config)
         { }
 
-        [Produces("application/json", Type = typeof(IEnumerable<Company>))]
         [HttpGet]
+        [Route("items")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public override async Task<IActionResult> Get()
         {
             return await base.Get();
         }
 
-        [Produces("application/json", Type = typeof(Company))]
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("items/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public override async Task<IActionResult> Get(int id)
         {
             return await base.Get(id);
@@ -31,6 +38,9 @@ namespace TimeTable.Api.Controllers
 
         [Produces("application/json", Type = typeof(Company))]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public override async Task<IActionResult> Post([FromBody] Company company)
         {
             return await base.Post(company);

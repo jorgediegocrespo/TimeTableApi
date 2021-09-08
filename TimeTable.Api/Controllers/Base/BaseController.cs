@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Contracts.Configuration;
@@ -19,31 +20,39 @@ namespace TimeTable.Api.Controllers.Base
             _config = config;
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(401)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Get()
         {
             var entities = await _service.GetAllAsync();
             return Ok(entities.ToList());
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(401)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Get(int id)
         {
+            if (id < 1)
+                return BadRequest("id should be greater than 0");
             var entity = await _service.GetAsync(id);
-            return Ok(entity);
+            if (entity == null)
+                return NotFound();
+            else
+                return Ok(entity);
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(401)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Post(T item)
         {
+            if (item == null)
+                return BadRequest();
+
             var created = await _service.AddAsync(item);
-            return Ok(created);
+            return CreatedAtRoute(nameof(Get), new { id = created.Id}, created);
         }
 
         [ProducesResponseType(200)]
