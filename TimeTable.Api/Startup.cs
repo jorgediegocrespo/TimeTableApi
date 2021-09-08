@@ -37,12 +37,11 @@ namespace TimeTable.Api
 
             SwaggerConfig.AddRegistration(app);
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             //app.UseAuthorization();
 
-            app.UseLogMiddleware();
+            app.UseMiddlewares();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

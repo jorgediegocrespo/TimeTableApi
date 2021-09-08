@@ -4,7 +4,7 @@ namespace TimeTable.CrossCutting.Middleware
 {
     public static class MiddlewareManager
     {
-        public static IApplicationBuilder UseLogMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseMiddlewares(this IApplicationBuilder builder)
         {
             builder.UseMiddleware<LogMiddleware>();
             builder.UseMiddleware<ExceptionHandlerMiddleware>();

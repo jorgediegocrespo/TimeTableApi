@@ -9,8 +9,8 @@ using TimeTable.Business.Models;
 
 namespace TimeTable.Api.Controllers
 {
-    [Produces("application/json")]
     [Route("api/company")]
+    //[ApiController]
     public class CompanyController : BaseController<Company>
     {
         public CompanyController(ICompanyService service, IAppConfig config) : base(service, config)
@@ -36,24 +36,19 @@ namespace TimeTable.Api.Controllers
             return await base.Get(id);
         }
 
-        [Produces("application/json", Type = typeof(Company))]
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public override async Task<IActionResult> Post([FromBody] Company company)
         {
             return await base.Post(company);
         }
 
-        [Produces("application/json", Type = typeof(Company))]
         [HttpPut]
         public override async Task<IActionResult> Put([FromBody] Company company)
         {
             return await base.Put(company);
         }
 
-        [Produces("application/json", Type = typeof(bool))]
         [HttpDelete("{id}")]
         public override async Task<IActionResult> Delete(int id)
         {
