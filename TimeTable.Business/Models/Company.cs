@@ -8,11 +8,11 @@ namespace TimeTable.Business.Models
     {
         public int Id { get; set; }
 
-        //[Required]
-        //[MaxLength(450)]
-        //[MinLength(4)]
+        [Required]
+        [MaxLength(450)]
+        [MinLength(4)]
         public string Name { get; set; }
 
-        public List<Person> People { get; set; }
+        public IEnumerable<Person> People { get; set; }
     }
 }

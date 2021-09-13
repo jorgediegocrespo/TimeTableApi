@@ -18,8 +18,6 @@ namespace TimeTable.Api.Controllers
 
         [HttpGet]
         [Route("items")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public override async Task<IActionResult> Get()
         {
             return await base.Get();
@@ -27,10 +25,6 @@ namespace TimeTable.Api.Controllers
 
         [HttpGet]
         [Route("items/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public override async Task<IActionResult> Get(int id)
         {
             return await base.Get(id);
@@ -40,7 +34,14 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public override async Task<IActionResult> Post([FromBody] Company company)
         {
-            return await base.Post(company);
+            if (ModelState.IsValid)
+            {
+                return await base.Post(company);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPut]

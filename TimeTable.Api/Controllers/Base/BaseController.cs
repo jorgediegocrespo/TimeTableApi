@@ -51,6 +51,9 @@ namespace TimeTable.Api.Controllers.Base
             if (item == null)
                 return BadRequest();
 
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             var created = await _service.AddAsync(item);
             return CreatedAtRoute(nameof(Get), new { id = created.Id}, created);
         }
@@ -60,6 +63,12 @@ namespace TimeTable.Api.Controllers.Base
         [ProducesResponseType(401)]
         public virtual async Task<IActionResult> Put(T item)
         {
+            if (item == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             var updated = await _service.UpdateAsync(item);
             return Ok(updated);
         }
