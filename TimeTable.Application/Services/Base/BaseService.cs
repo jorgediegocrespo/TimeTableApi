@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Mappers.Base;
 using TimeTable.Application.Contracts.Services.Base;
+using TimeTable.Application.Exceptions;
 using TimeTable.Business.Models.Base;
 using TimeTable.DataAccess.Contracts.Entities.Base;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
@@ -73,6 +75,7 @@ namespace TimeTable.Application.Services.Base
 
         public async Task<T> UpdateAsync(T entity)
         {
+            await ValidateEntityToUpdateAsync(entity);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -87,6 +90,7 @@ namespace TimeTable.Application.Services.Base
 
         public async Task<bool> DeleteAsync(int id)
         {
+            await ValidateEntityToDeleteAsync(id);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -102,6 +106,20 @@ namespace TimeTable.Application.Services.Base
         protected virtual Task ValidateEntityToAddAsync(T entity)
         {
             return Task.CompletedTask;
+        }
+
+        protected virtual async Task ValidateEntityToUpdateAsync(T entity)
+        {
+            bool existsItem = await repository.ExistsAsync(x => x.Id == entity.Id);
+            if (!existsItem)
+                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {entity.Id}");
+        }
+
+        protected virtual async Task ValidateEntityToDeleteAsync(int id)
+        {
+            bool existsItem = await repository.ExistsAsync(x => x.Id == id);
+            if (!existsItem)
+                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {id}");
         }
     }
 }

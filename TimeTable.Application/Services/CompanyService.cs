@@ -13,16 +13,36 @@ namespace TimeTable.Application.Services
 {
     public class CompanyService : BaseService<Company, CompanyEntity>, ICompanyService
     {
-        public CompanyService(ICompanyRepository repository, IAppConfig appConfig)
+        private readonly IPersonRepository personRepository;
+
+        public CompanyService(ICompanyRepository repository, IAppConfig appConfig, IPersonRepository personRepository)
             : base(repository, appConfig, new CompanyMapper())
-        { }
+        {
+            this.personRepository = personRepository;
+        }
 
         protected override async Task ValidateEntityToAddAsync(Company entity)
         {
             await base.ValidateEntityToAddAsync(entity);
-            bool existsCompany = await repository.ExistsAsync(x => x.Name.ToLower() == entity.Name.ToLower());
-            if (existsCompany)
+            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == entity.Name.ToLower());
+            if (existsCompanyName)
                 throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {entity.Name} already exists in other company");
+        }
+
+        protected override async Task ValidateEntityToUpdateAsync(Company entity)
+        {
+            await base.ValidateEntityToUpdateAsync(entity);
+            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == entity.Name.ToLower() && x.Id != entity.Id);
+            if (existsCompanyName)
+                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {entity.Name} already exists in other company");
+        }
+
+        protected override async Task ValidateEntityToDeleteAsync(int id)
+        {
+            await base.ValidateEntityToDeleteAsync(id);
+            bool hasPeople = await personRepository.ExistsAsync(x => x.CompanyId == id);
+            if (hasPeople)
+                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The company has associated people");
         }
     }
 }
