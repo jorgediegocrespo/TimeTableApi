@@ -11,7 +11,7 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class CompanyService : BaseService<Company, CompanyEntity>, ICompanyService
+    public class CompanyService : BaseService<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany, CompanyEntity>, ICompanyService
     {
         private readonly IPersonRepository personRepository;
 
@@ -21,20 +21,20 @@ namespace TimeTable.Application.Services
             this.personRepository = personRepository;
         }
 
-        protected override async Task ValidateEntityToAddAsync(Company entity)
+        protected override async Task ValidateEntityToAddAsync(CreationCompany businessModel)
         {
-            await base.ValidateEntityToAddAsync(entity);
-            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == entity.Name.ToLower());
+            await base.ValidateEntityToAddAsync(businessModel);
+            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
             if (existsCompanyName)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {entity.Name} already exists in other company");
+                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
         }
 
-        protected override async Task ValidateEntityToUpdateAsync(Company entity)
+        protected override async Task ValidateEntityToUpdateAsync(UpdatingCompany businessModel)
         {
-            await base.ValidateEntityToUpdateAsync(entity);
-            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == entity.Name.ToLower() && x.Id != entity.Id);
+            await base.ValidateEntityToUpdateAsync(businessModel);
+            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
             if (existsCompanyName)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {entity.Name} already exists in other company");
+                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
         }
 
         protected override async Task ValidateEntityToDeleteAsync(int id)
@@ -42,7 +42,7 @@ namespace TimeTable.Application.Services
             await base.ValidateEntityToDeleteAsync(id);
             bool hasPeople = await personRepository.ExistsAsync(x => x.CompanyId == id);
             if (hasPeople)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The company has associated people");
+                throw new NotValidItemException(ErrorCodes.COMPANY_HAS_PEOPLE, $"The company has associated people");
         }
     }
 }

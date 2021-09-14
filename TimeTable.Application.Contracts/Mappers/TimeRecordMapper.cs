@@ -4,27 +4,48 @@ using TimeTable.DataAccess.Contracts.Entities;
 
 namespace TimeTable.Application.Contracts.Mappers
 {
-    public class TimeRecordMapper : IMapper<TimeRecord, TimeRecordEntity>
+    public class TimeRecordMapper : IMapper<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord, TimeRecordEntity>
     {
-        public TimeRecordEntity Map(TimeRecord dto)
+        public BasicReadingTimeRecord MapBasicReading(TimeRecordEntity entity)
         {
-            return new TimeRecordEntity()
+            return new BasicReadingTimeRecord()
             {
-                Id = dto.Id,
-                PersonId = dto.PersonId,
-                StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime,
+                Id = entity.Id,
+                PersonId = entity.PersonId,
+                StartDateTime = entity.StartDateTime,
+                EndDateTime = entity.EndDateTime,
+            };
+        }
+        public DetailedReadingTimeRecord MapDetailedReading(TimeRecordEntity entity)
+        {
+            return new DetailedReadingTimeRecord()
+            {
+                Id = entity.Id,
+                PersonId = entity.PersonId,
+                StartDateTime = entity.StartDateTime,
+                EndDateTime = entity.EndDateTime,
             };
         }
 
-        public TimeRecord Map(TimeRecordEntity dto)
+        public TimeRecordEntity MapCreating(CreationTimeRecord businessModel)
         {
-            return new TimeRecord()
+            return new TimeRecordEntity()
             {
-                Id = dto.Id,
-                PersonId = dto.PersonId,
-                StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime,
+                PersonId = businessModel.PersonId,
+                StartDateTime = businessModel.StartDateTime,
+                EndDateTime = businessModel.EndDateTime,
+            };
+        }
+
+
+        public TimeRecordEntity MapUpdating(UpdatingTimeRecord businessModel)
+        {
+            return new TimeRecordEntity()
+            {
+                Id = businessModel.Id,
+                PersonId = businessModel.PersonId,
+                StartDateTime = businessModel.StartDateTime,
+                EndDateTime = businessModel.EndDateTime,
             };
         }
     }

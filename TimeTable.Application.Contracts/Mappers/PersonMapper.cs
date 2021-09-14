@@ -4,25 +4,47 @@ using TimeTable.DataAccess.Contracts.Entities;
 
 namespace TimeTable.Application.Contracts.Mappers
 {
-    public class PersonMapper : IMapper<Person, PersonEntity>
+    public class PersonMapper : IMapper<BasicReadingPerson, DetailedReadingPerson, CreationBusinessPerson, UpdatingBusinessPerson, PersonEntity>
     {
-        public PersonEntity Map(Person dto)
+        public BasicReadingPerson MapBasicReading(PersonEntity entity)
         {
-            return new PersonEntity()
+            return new BasicReadingPerson()
             {
-                Id = dto.Id,
-                Name = dto.Name,
-                IsAdmin = dto.IsAdmin,
+                Id = entity.Id,
+                Name = entity.Name,
+                IsAdmin = entity.IsAdmin,
+                CompanyId = entity.CompanyId
             };
         }
 
-        public Person Map(PersonEntity dto)
+        public DetailedReadingPerson MapDetailedReading(PersonEntity entity)
         {
-            return new Person()
+            return new DetailedReadingPerson()
             {
-                Id = dto.Id,
-                Name = dto.Name,
-                IsAdmin = dto.IsAdmin,
+                Id = entity.Id,
+                Name = entity.Name,
+                IsAdmin = entity.IsAdmin,
+                CompanyId = entity.CompanyId
+            };
+        }
+
+        public PersonEntity MapCreating(CreationBusinessPerson businessModel)
+        {
+            return new PersonEntity()
+            {
+                Name = businessModel.Name,
+                IsAdmin = businessModel.IsAdmin,
+                CompanyId = businessModel.CompanyId
+            };
+        }        
+
+        public PersonEntity MapUpdating(UpdatingBusinessPerson businessModel)
+        {
+            return new PersonEntity()
+            {
+                Id = businessModel.Id,
+                Name = businessModel.Name,
+                IsAdmin = businessModel.IsAdmin
             };
         }
     }

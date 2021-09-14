@@ -4,6 +4,7 @@
     {
         public const string ITEM_NOT_EXISTS = "ITEM_NOT_EXISTS";
 
-        public const string COMPANY_NAME_EXISTS = "COMPANY_NAME_EXISTS";        
+        public const string COMPANY_NAME_EXISTS = "COMPANY_NAME_EXISTS";
+        public const string COMPANY_HAS_PEOPLE = "COMPANY_NAME_EXISTS";
     }
 }

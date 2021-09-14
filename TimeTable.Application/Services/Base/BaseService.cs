@@ -15,22 +15,25 @@ using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.Application.Services.Base
 {
-    public abstract class BaseService<T, R> : IBaseCrudService<T>
-        where T : IBaseBusinessModel
-        where R : class, IBaseWithIdEntity
+    public abstract class BaseService<BR, DR, C, U, E> : IBaseCrudService<BR, DR, C, U>
+        where BR : IBasicReadingBusinessModel
+        where DR : IDetailedReadingBusinessModel
+        where C : ICreationBusinessModel
+        where U : IUpdatingBusinessModel
+        where E : IBaseWithIdEntity
     {
-        protected readonly IRepository<R> repository;
+        protected readonly IRepository<E> repository;
         protected readonly IAppConfig appConfig;
-        protected readonly IMapper<T, R> mapper;
+        protected readonly IMapper<BR, DR, C, U, E> mapper;
 
-        public BaseService(IRepository<R> repository, IAppConfig appConfig, IMapper<T, R> mapper)
+        public BaseService(IRepository<E> repository, IAppConfig appConfig, IMapper<BR, DR, C, U, E> mapper)
         {
             this.repository = repository;
             this.appConfig = appConfig;
             this.mapper = mapper;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<BR>> GetAllAsync()
         {
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
@@ -39,12 +42,12 @@ namespace TimeTable.Application.Services.Base
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    IEnumerable<R> allEntities = await repository.GetAllAsync();
-                    return allEntities.Select(o => mapper.Map(o));
+                    IEnumerable<E> allEntities = await repository.GetAllAsync();
+                    return allEntities.Select(o => mapper.MapBasicReading(o));
                 });
         }
 
-        public async Task<T> GetAsync(int id)
+        public async Task<DR> GetAsync(int id)
         {
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
@@ -53,14 +56,14 @@ namespace TimeTable.Application.Services.Base
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    R entity = await repository.GetAsync(id);
-                    return mapper.Map(entity);
+                    E entity = await repository.GetAsync(id);
+                    return mapper.MapDetailedReading(entity);
                 });
         }
 
-        public async Task<T> AddAsync(T entity)
+        public async Task<int> AddAsync(C businessModel)
         {
-            await ValidateEntityToAddAsync(entity);
+            await ValidateEntityToAddAsync(businessModel);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -68,23 +71,22 @@ namespace TimeTable.Application.Services.Base
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    R addedEntity = await repository.AddAsync(mapper.Map(entity));
-                    return mapper.Map(addedEntity);
+                    E addedEntity = await repository.AddAsync(mapper.MapCreating(businessModel));
+                    return addedEntity.Id;
                 });
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public async Task UpdateAsync(U businessModel)
         {
-            await ValidateEntityToUpdateAsync(entity);
+            await ValidateEntityToUpdateAsync(businessModel);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
             AsyncRetryPolicy retryPolity = Policy.Handle<Exception>().WaitAndRetryAsync(maxTrys, i => timeToWait);
-            return await retryPolity.ExecuteAsync(
+            await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    var updatedEntity = await repository.UpdateAsync(mapper.Map(entity));
-                    return mapper.Map(updatedEntity);
+                    var updatedEntity = await repository.UpdateAsync(mapper.MapUpdating(businessModel));
                 });
         }
 
@@ -103,16 +105,16 @@ namespace TimeTable.Application.Services.Base
                 });
         }
 
-        protected virtual Task ValidateEntityToAddAsync(T entity)
+        protected virtual Task ValidateEntityToAddAsync(C businessModel)
         {
             return Task.CompletedTask;
         }
 
-        protected virtual async Task ValidateEntityToUpdateAsync(T entity)
+        protected virtual async Task ValidateEntityToUpdateAsync(U businessModel)
         {
-            bool existsItem = await repository.ExistsAsync(x => x.Id == entity.Id);
+            bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
             if (!existsItem)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {entity.Id}");
+                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
         }
 
         protected virtual async Task ValidateEntityToDeleteAsync(int id)
