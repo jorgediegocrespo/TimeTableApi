@@ -4,7 +4,7 @@ using TimeTable.DataAccess.Contracts.Entities;
 
 namespace TimeTable.Application.Contracts.Mappers
 {
-    public class PersonMapper : IMapper<BasicReadingPerson, DetailedReadingPerson, CreationBusinessPerson, UpdatingBusinessPerson, PersonEntity>
+    public class PersonMapper : IMapper<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>
     {
         public BasicReadingPerson MapBasicReading(PersonEntity entity)
         {
@@ -28,7 +28,7 @@ namespace TimeTable.Application.Contracts.Mappers
             };
         }
 
-        public PersonEntity MapCreating(CreationBusinessPerson businessModel)
+        public PersonEntity MapCreating(CreationPerson businessModel)
         {
             return new PersonEntity()
             {

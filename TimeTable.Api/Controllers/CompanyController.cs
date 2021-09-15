@@ -10,14 +10,15 @@ using TimeTable.Business.Models;
 namespace TimeTable.Api.Controllers
 {
     [Route("api/company")]
-    //[ApiController]
-    public class CompanyController : BaseController<Company>
+    [ApiController]
+    public class CompanyController : BaseController<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
     {
         public CompanyController(ICompanyService service, IAppConfig config) : base(service, config)
         { }
 
         [HttpGet]
         [Route("items")]
+        [ProducesResponseType(typeof(IEnumerable<BasicReadingCompany>), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get()
         {
             return await base.Get();
@@ -25,6 +26,7 @@ namespace TimeTable.Api.Controllers
 
         [HttpGet]
         [Route("items/{id}")]
+        [ProducesResponseType(typeof(DetailedReadingCompany), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get(int id)
         {
             return await base.Get(id);
@@ -32,20 +34,14 @@ namespace TimeTable.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public override async Task<IActionResult> Post([FromBody] Company company)
+        public override async Task<IActionResult> Post([FromBody] CreationCompany company)
         {
-            if (ModelState.IsValid)
-            {
-                return await base.Post(company);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return await base.Post(company);
         }
 
         [HttpPut]
-        public override async Task<IActionResult> Put([FromBody] Company company)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public override async Task<IActionResult> Put([FromBody] UpdatingCompany company)
         {
             return await base.Put(company);
         }

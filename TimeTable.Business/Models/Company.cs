@@ -20,7 +20,7 @@ namespace TimeTable.Business.Models
         public string Name { get; set; }
 
         [Required]
-        public CreationBusinessPerson Creator { get; set; }
+        public CreationPerson Creator { get; set; }
     }
 
     public class UpdatingCompany : IUpdatingBusinessModel

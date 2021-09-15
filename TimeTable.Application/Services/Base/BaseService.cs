@@ -90,18 +90,17 @@ namespace TimeTable.Application.Services.Base
                 });
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             await ValidateEntityToDeleteAsync(id);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
             AsyncRetryPolicy retryPolity = Policy.Handle<Exception>().WaitAndRetryAsync(maxTrys, i => timeToWait);
-            return await retryPolity.ExecuteAsync(
+            await retryPolity.ExecuteAsync(
                 async () =>
                 {
                     await repository.DeleteAsync(id);
-                    return true;
                 });
         }
 

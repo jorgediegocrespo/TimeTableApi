@@ -16,7 +16,7 @@ namespace TimeTable.Business.Models
         public BasicReadingCompany Company { get; set; }
     }
 
-    public class CreationBusinessPerson : ICreationBusinessModel
+    public class CreationPerson : ICreationBusinessModel
     {
         [Required]
         [MaxLength(450)]
