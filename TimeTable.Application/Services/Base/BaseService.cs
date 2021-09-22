@@ -63,22 +63,26 @@ namespace TimeTable.Application.Services.Base
 
         public async Task<int> AddAsync(C businessModel)
         {
-            await ValidateEntityToAddAsync(businessModel);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
+            //TODO Review exception managed with polly
             AsyncRetryPolicy retryPolity = Policy.Handle<Exception>().WaitAndRetryAsync(maxTrys, i => timeToWait);
-            return await retryPolity.ExecuteAsync(
-                async () =>
-                {
-                    E addedEntity = await repository.AddAsync(mapper.MapCreating(businessModel));
-                    return addedEntity.Id;
-                });
+            return await retryPolity.ExecuteAsync(async () =>
+            {
+                await ValidateEntityToAddAsync(businessModel);
+                return await DoAddOperationsAsync(businessModel);
+            });
+        }
+
+        protected virtual async Task<int> DoAddOperationsAsync(C businessModel)
+        {
+            E addedEntity = await repository.AddAsync(mapper.MapCreating(businessModel));
+            return addedEntity.Id;
         }
 
         public async Task UpdateAsync(U businessModel)
         {
-            await ValidateEntityToUpdateAsync(businessModel);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -86,13 +90,18 @@ namespace TimeTable.Application.Services.Base
             await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    var updatedEntity = await repository.UpdateAsync(mapper.MapUpdating(businessModel));
+                    await ValidateEntityToUpdateAsync(businessModel);
+                    await DoUpdateOperationsAsync(businessModel);
                 });
+        }
+
+        protected virtual async Task DoUpdateOperationsAsync(U businessModel)
+        {
+            await repository.UpdateAsync(mapper.MapUpdating(businessModel));
         }
 
         public async Task DeleteAsync(int id)
         {
-            await ValidateEntityToDeleteAsync(id);
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
 
@@ -100,8 +109,14 @@ namespace TimeTable.Application.Services.Base
             await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    await repository.DeleteAsync(id);
+                    await ValidateEntityToDeleteAsync(id);
+                    await DoDeleteOperationsAsync(id);
                 });
+        }
+
+        protected virtual async Task DoDeleteOperationsAsync(int id)
+        {
+            await repository.DeleteAsync(id);
         }
 
         protected virtual Task ValidateEntityToAddAsync(C businessModel)

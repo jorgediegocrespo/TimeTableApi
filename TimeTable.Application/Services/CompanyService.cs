@@ -27,6 +27,11 @@ namespace TimeTable.Application.Services
             bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
             if (existsCompanyName)
                 throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
+
+            //TODO Remove calling person service to validate and create person
+            bool existsPersonName = await personRepository.ExistsAsync(x => x.Name.ToLower() == businessModel.Creator.Name.ToLower());
+            if (existsPersonName)
+                throw new NotValidItemException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
         }
 
         protected override async Task ValidateEntityToUpdateAsync(UpdatingCompany businessModel)
