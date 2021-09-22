@@ -3,6 +3,6 @@ using TimeTable.Business.Models;
 
 namespace TimeTable.Application.Contracts.Services
 {
-    public interface ICompanyService : IBaseCrudService<Company>
+    public interface ICompanyService : IBaseCrudService<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
     { }
 }

@@ -4,20 +4,37 @@ using TimeTable.DataAccess.Contracts.Entities;
 
 namespace TimeTable.Application.Contracts.Mappers
 {
-    public class CompanyMapper : IMapper<Company, CompanyEntity>
+    public class CompanyMapper : IMapper<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany, CompanyEntity>
     {
-        public CompanyEntity Map(Company dto)
+        public BasicReadingCompany MapBasicReading(CompanyEntity entity)
+        {
+            return new BasicReadingCompany()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+            };
+        }
+        public DetailedReadingCompany MapDetailedReading(CompanyEntity entity)
+        {
+            return new DetailedReadingCompany()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+            };
+        }
+
+        public CompanyEntity MapCreating(CreationCompany dto)
         {
             return new CompanyEntity()
             {
-                Id = dto.Id,
                 Name = dto.Name,
             };
         }
 
-        public Company Map(CompanyEntity dto)
+
+        public CompanyEntity MapUpdating(UpdatingCompany dto)
         {
-            return new Company()
+            return new CompanyEntity()
             {
                 Id = dto.Id,
                 Name = dto.Name,

@@ -4,13 +4,16 @@ using TimeTable.Business.Models.Base;
 
 namespace TimeTable.Application.Contracts.Services.Base
 {
-    public interface IBaseCrudService<T>
-        where T : IBaseBusinessModel
+    public interface IBaseCrudService<BR, DR, C, U>
+        where BR : IBasicReadingBusinessModel
+        where DR : IDetailedReadingBusinessModel
+        where C : ICreationBusinessModel
+        where U : IUpdatingBusinessModel
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetAsync(int id);
-        Task<T> AddAsync(T entity);
-        Task<bool> DeleteAsync(int id);
-        Task<T> UpdateAsync(T entity);
+        Task<IEnumerable<BR>> GetAllAsync();
+        Task<DR> GetAsync(int id);
+        Task<int> AddAsync(C businessModel);
+        Task DeleteAsync(int id);
+        Task UpdateAsync(U businessModel);
     }
 }
