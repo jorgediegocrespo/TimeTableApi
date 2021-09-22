@@ -7,6 +7,7 @@ using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
 using TimeTable.Business.Models;
+using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories;
 
@@ -14,8 +15,8 @@ namespace TimeTable.Application.Services
 {
     public class TimeRecordService : BaseService<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord, TimeRecordEntity>, ITimeRecordService
     {
-        public TimeRecordService(ITimeRecordRepository repository, IAppConfig appConfig)
-            : base(repository, appConfig, new TimeRecordMapper())
+        public TimeRecordService(IUnitOfWork unitOfWork, ITimeRecordRepository repository, IAppConfig appConfig)
+            : base(unitOfWork, repository, appConfig, new TimeRecordMapper())
         { }
 
         protected override async Task ValidateEntityToAddAsync(CreationTimeRecord businessModel)

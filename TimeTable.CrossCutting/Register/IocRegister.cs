@@ -3,6 +3,8 @@ using TimeTable.Application.Configuration;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Services;
+using TimeTable.DataAccess;
+using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Repositories;
 using TimeTable.DataAccess.Repositories;
 
@@ -13,6 +15,7 @@ namespace TimeTable.CrossCutting.Register
         public static void RegisterDbContext(IServiceCollection services, string connectionString)
         {
             DataAccess.Startup.RegisterDbContext(services, connectionString);
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
 
         public static void AddRegistration(this IServiceCollection services)

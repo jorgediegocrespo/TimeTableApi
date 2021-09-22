@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.EntityConfig;
 
 namespace TimeTable.DataAccess
 {
-    public class TimeTableDbContext : DbContext, ITimeTableDbContext
+    public class TimeTableDbContext : DbContext
     {
         public TimeTableDbContext(DbContextOptions options) : base(options) { }
         public TimeTableDbContext() { }

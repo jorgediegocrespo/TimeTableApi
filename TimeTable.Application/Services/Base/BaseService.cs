@@ -10,6 +10,7 @@ using TimeTable.Application.Contracts.Mappers.Base;
 using TimeTable.Application.Contracts.Services.Base;
 using TimeTable.Application.Exceptions;
 using TimeTable.Business.Models.Base;
+using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities.Base;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
 
@@ -22,12 +23,14 @@ namespace TimeTable.Application.Services.Base
         where U : IUpdatingBusinessModel
         where E : IBaseWithIdEntity
     {
+        protected readonly IUnitOfWork unitOfWork;
         protected readonly IRepository<E> repository;
         protected readonly IAppConfig appConfig;
         protected readonly IMapper<BR, DR, C, U, E> mapper;
 
-        public BaseService(IRepository<E> repository, IAppConfig appConfig, IMapper<BR, DR, C, U, E> mapper)
+        public BaseService(IUnitOfWork unitOfWork, IRepository<E> repository, IAppConfig appConfig, IMapper<BR, DR, C, U, E> mapper)
         {
+            this.unitOfWork = unitOfWork;
             this.repository = repository;
             this.appConfig = appConfig;
             this.mapper = mapper;
@@ -75,10 +78,17 @@ namespace TimeTable.Application.Services.Base
             });
         }
 
+        protected virtual Task ValidateEntityToAddAsync(C businessModel)
+        {
+            return Task.CompletedTask;
+        }
+
         protected virtual async Task<int> DoAddOperationsAsync(C businessModel)
         {
-            E addedEntity = await repository.AddAsync(mapper.MapCreating(businessModel));
-            return addedEntity.Id;
+            var entity = mapper.MapCreating(businessModel);
+            await repository.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
+            return entity.Id;
         }
 
         public async Task UpdateAsync(U businessModel)
@@ -95,9 +105,17 @@ namespace TimeTable.Application.Services.Base
                 });
         }
 
+        protected virtual async Task ValidateEntityToUpdateAsync(U businessModel)
+        {
+            bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
+            if (!existsItem)
+                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
+        }
+
         protected virtual async Task DoUpdateOperationsAsync(U businessModel)
         {
             await repository.UpdateAsync(mapper.MapUpdating(businessModel));
+            await unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
@@ -114,28 +132,17 @@ namespace TimeTable.Application.Services.Base
                 });
         }
 
-        protected virtual async Task DoDeleteOperationsAsync(int id)
-        {
-            await repository.DeleteAsync(id);
-        }
-
-        protected virtual Task ValidateEntityToAddAsync(C businessModel)
-        {
-            return Task.CompletedTask;
-        }
-
-        protected virtual async Task ValidateEntityToUpdateAsync(U businessModel)
-        {
-            bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
-            if (!existsItem)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
-        }
-
         protected virtual async Task ValidateEntityToDeleteAsync(int id)
         {
             bool existsItem = await repository.ExistsAsync(x => x.Id == id);
             if (!existsItem)
                 throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {id}");
+        }
+
+        protected virtual async Task DoDeleteOperationsAsync(int id)
+        {
+            await repository.DeleteAsync(id);
+            await unitOfWork.SaveChangesAsync();
         }
     }
 }

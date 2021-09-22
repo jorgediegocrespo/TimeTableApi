@@ -6,6 +6,7 @@ using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
 using TimeTable.Business.Models;
+using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories;
 
@@ -15,8 +16,8 @@ namespace TimeTable.Application.Services
     {
         private readonly ICompanyRepository companyRepository;
 
-        public PersonService(IPersonRepository repository, IAppConfig appConfig, ICompanyRepository companyRepository)
-            : base(repository, appConfig, new PersonMapper())
+        public PersonService(IUnitOfWork unitOfWork, IPersonRepository repository, IAppConfig appConfig, ICompanyRepository companyRepository)
+            : base(unitOfWork, repository, appConfig, new PersonMapper())
         {
             this.companyRepository = companyRepository;
         }
