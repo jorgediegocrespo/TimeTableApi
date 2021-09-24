@@ -11,7 +11,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/person")]
     [ApiController]
-    public class PersonController : BaseController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
+    public class PersonController : BaseCrudController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
     {
         public PersonController(IPersonService service, IAppConfig config) : base(service, config)
         { }
@@ -27,9 +27,9 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
-        public override async Task<IActionResult> Get(int id)
+        public override async Task<IActionResult> GetById(int id)
         {
-            return await base.Get(id);
+            return await base.GetById(id);
         }
 
         [HttpPost]

@@ -11,7 +11,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/company")]
     [ApiController]
-    public class CompanyController : BaseController<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
+    public class CompanyController : BaseCrudController<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
     {
         public CompanyController(ICompanyService service, IAppConfig config) : base(service, config)
         { }
@@ -27,9 +27,9 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(DetailedReadingCompany), StatusCodes.Status200OK)]
-        public override async Task<IActionResult> Get(int id)
+        public override async Task<IActionResult> GetById(int id)
         {
-            return await base.Get(id);
+            return await base.GetById(id);
         }
 
         [HttpPost]

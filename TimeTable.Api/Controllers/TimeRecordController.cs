@@ -11,7 +11,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/timeRecord")]
     [ApiController]
-    public class TimeRecordController : BaseController<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord>
+    public class TimeRecordController : BaseCrudController<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord>
     {
         public TimeRecordController(ITimeRecordService service, IAppConfig config) : base(service, config)
         { }
@@ -27,9 +27,9 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(DetailedReadingTimeRecord), StatusCodes.Status200OK)]
-        public override async Task<IActionResult> Get(int id)
+        public override async Task<IActionResult> GetById(int id)
         {
-            return await base.Get(id);
+            return await base.GetById(id);
         }
 
         [HttpPost]

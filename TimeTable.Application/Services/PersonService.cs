@@ -12,7 +12,7 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class PersonService : BaseService<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>, IPersonService
+    public class PersonService : BaseCrudService<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>, IPersonService
     {
         private readonly ICompanyRepository companyRepository;
 

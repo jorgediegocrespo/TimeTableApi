@@ -8,7 +8,7 @@ using TimeTable.Business.Models.Base;
 
 namespace TimeTable.Api.Controllers.Base
 {
-    public class BaseController<BR, DR, C, U> : Controller
+    public class BaseCrudController<BR, DR, C, U> : Controller
         where BR : IBasicReadingBusinessModel
         where DR : IDetailedReadingBusinessModel
         where C : ICreationBusinessModel
@@ -17,7 +17,7 @@ namespace TimeTable.Api.Controllers.Base
         private readonly IBaseCrudService<BR, DR, C, U> service;
         private readonly IAppConfig config;
 
-        public BaseController(IBaseCrudService<BR, DR, C, U> service, IAppConfig config)
+        public BaseCrudController(IBaseCrudService<BR, DR, C, U> service, IAppConfig config)
         {
             this.service = service;
             this.config = config;
@@ -33,7 +33,7 @@ namespace TimeTable.Api.Controllers.Base
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public virtual async Task<IActionResult> Get(int id)
+        public virtual async Task<IActionResult> GetById(int id)
         {
             DR entity = await service.GetAsync(id);
             if (entity == null)
@@ -54,7 +54,7 @@ namespace TimeTable.Api.Controllers.Base
                 return BadRequest();
 
             int createdId = await service.AddAsync(item);
-            return CreatedAtRoute(nameof(Get), new { id = createdId}, createdId);
+            return Created(nameof(GetById), new { id = createdId});
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]

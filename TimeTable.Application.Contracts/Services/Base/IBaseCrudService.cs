@@ -13,7 +13,10 @@ namespace TimeTable.Application.Contracts.Services.Base
         Task<IEnumerable<BR>> GetAllAsync();
         Task<DR> GetAsync(int id);
         Task<int> AddAsync(C businessModel);
-        Task DeleteAsync(int id);
+        Task<int> AddAsync(C businessModel, bool withTransaction);
         Task UpdateAsync(U businessModel);
+        Task UpdateAsync(U businessModel, bool withTransaction);
+        Task DeleteAsync(int id);
+        Task DeleteAsync(int id, bool withTransaction);
     }
 }

@@ -7,6 +7,6 @@ namespace TimeTable.DataAccess.Contracts
     public interface IUnitOfWork
     {
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-        public Task SaveChangesInTransactionAsync(Func<Task> operation);
+        public Task<int> SaveChangesInTransactionAsync(Func<Task<int>> operation);
     }
 }

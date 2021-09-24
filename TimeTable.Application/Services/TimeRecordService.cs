@@ -13,7 +13,7 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class TimeRecordService : BaseService<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord, TimeRecordEntity>, ITimeRecordService
+    public class TimeRecordService : BaseCrudService<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord, TimeRecordEntity>, ITimeRecordService
     {
         public TimeRecordService(IUnitOfWork unitOfWork, ITimeRecordRepository repository, IAppConfig appConfig)
             : base(unitOfWork, repository, appConfig, new TimeRecordMapper())

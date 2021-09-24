@@ -19,14 +19,15 @@ namespace TimeTable.DataAccess
             return timeTableDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task SaveChangesInTransactionAsync(Func<Task> operation)
+        public async Task<int> SaveChangesInTransactionAsync(Func<Task<int>> operation)
         {
             using (var transaction = await timeTableDbContext.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    await operation();
+                    int result = await operation();
                     await transaction.CommitAsync();
+                    return result;
                 }
                 catch
                 {
