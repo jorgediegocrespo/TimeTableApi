@@ -14,7 +14,7 @@ namespace TimeTable.DataAccess.Contracts.Repositories.Base
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetAsync(int id);
         Task DeleteAsync(int id);
-        Task<T> UpdateAsync(T entity);
-        Task<T> AddAsync(T entity);
+        Task UpdateAsync(T entity);
+        Task AddAsync(T entity);
     }
 }

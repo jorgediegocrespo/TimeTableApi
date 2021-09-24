@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities.Base;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
 
@@ -13,30 +12,24 @@ namespace TimeTable.DataAccess.Repositories.Base
     public abstract class BaseRepository<T> : IRepository<T>
         where T : class, IBaseWithIdEntity
     {
-        protected readonly ITimeTableDbContext dbContext;
+        protected readonly TimeTableDbContext dbContext;
 
-        public BaseRepository(ITimeTableDbContext dbContext)
+        public BaseRepository(TimeTableDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
         protected abstract DbSet<T> DbEntity { get; }
 
-        public async Task<T> AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
             await DbEntity.AddAsync(entity);
-            await dbContext.SaveChangesAsync();
-
-            return entity;
         }
 
         public async Task DeleteAsync(int id)
         {
             var entityToRemove = await DbEntity.SingleAsync(x => x.Id == id);
             DbEntity.Remove(entityToRemove);
-            await dbContext.SaveChangesAsync();
-
-            return;
         }
 
         public async Task<bool> ExistsAsync(int id) => await DbEntity.AnyAsync(x => x.Id == id);
@@ -47,12 +40,10 @@ namespace TimeTable.DataAccess.Repositories.Base
 
         public async Task<IEnumerable<T>> GetAllAsync() => await DbEntity.ToListAsync();
 
-        public async Task<T> UpdateAsync(T entity)
+        public Task UpdateAsync(T entity)
         {
             DbEntity.Update(entity);
-            await dbContext.SaveChangesAsync();
-
-            return entity;
+            return Task.CompletedTask;
         }
     }
 }
