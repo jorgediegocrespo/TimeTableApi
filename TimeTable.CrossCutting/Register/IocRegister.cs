@@ -34,6 +34,7 @@ namespace TimeTable.CrossCutting.Register
 
         private static void RegisterServices(IServiceCollection services)
         {
+            services.AddSingleton<ILoggerService, LoggerService>();
             services.AddTransient<ICompanyService, CompanyService>();
             services.AddTransient<IPersonService, PersonService>();
             services.AddTransient<ITimeRecordService, TimeRecordService>();
