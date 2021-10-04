@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TimeTable.Api.Config;
+using TimeTable.Api.Middleware;
 using TimeTable.CrossCutting.Middleware;
 using TimeTable.CrossCutting.Register;
 
@@ -41,6 +42,7 @@ namespace TimeTable.Api
 
             //app.UseAuthorization();
 
+            app.UseMiddleware<LogMiddleware>();
             app.UseMiddlewares();
             app.UseEndpoints(endpoints =>
             {
