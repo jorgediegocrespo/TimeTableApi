@@ -11,5 +11,7 @@
         public const string PERSON_NAME_EXISTS = "PERSON_NAME_EXISTS";
 
         public const string TIME_RECORD_OVERLAPPING_EXISTS = "TIME_RECORD_OVERLAPPING_EXISTS";
+
+        public const string USER_REGISTER_ERROR = "USER_REGISTER_ERROR";
     }
 }

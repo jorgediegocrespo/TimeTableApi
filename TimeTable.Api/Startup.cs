@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 using TimeTable.Api.Config;
 using TimeTable.Api.Middleware;
 using TimeTable.CrossCutting.Middleware;
@@ -25,7 +29,18 @@ namespace TimeTable.Api
             IocRegister.RegisterDbContext(services, Configuration.GetConnectionString("DataBaseConnection"));
             IocRegister.AddRegistration(services);
             services.AddControllers();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+                    ClockSkew = TimeSpan.Zero
+                });
             SwaggerConfig.AddRegistration(services);
+            IocRegister.RegisterIdentity(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,7 +55,7 @@ namespace TimeTable.Api
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseMiddleware<LogMiddleware>();
             app.UseMiddlewares();

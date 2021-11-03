@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using TimeTable.Application.Configuration;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
@@ -25,6 +26,13 @@ namespace TimeTable.CrossCutting.Register
             RegisterOthers(services);
         }
 
+        public static void RegisterIdentity(IServiceCollection services)
+        {
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                    .AddEntityFrameworkStores<TimeTableDbContext>()
+                    .AddDefaultTokenProviders();
+        }
+
         private static void RegisterRepositories(IServiceCollection services)
         {
             services.AddTransient<ICompanyRepository, CompanyRepository>();
@@ -35,6 +43,7 @@ namespace TimeTable.CrossCutting.Register
         private static void RegisterServices(IServiceCollection services)
         {
             services.AddSingleton<ILoggerService, LoggerService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICompanyService, CompanyService>();
             services.AddTransient<IPersonService, PersonService>();
             services.AddTransient<ITimeRecordService, TimeRecordService>();

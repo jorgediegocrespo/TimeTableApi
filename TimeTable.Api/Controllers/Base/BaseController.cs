@@ -8,14 +8,14 @@ using TimeTable.Business.Models.Base;
 
 namespace TimeTable.Api.Controllers.Base
 {
-    public class BaseCrudController<BR, DR, C, U> : Controller
+    public class BaseCrudController<BR, DR, C, U> : ControllerBase
         where BR : IBasicReadingBusinessModel
         where DR : IDetailedReadingBusinessModel
         where C : ICreationBusinessModel
         where U : IUpdatingBusinessModel
     {
-        private readonly IBaseCrudService<BR, DR, C, U> service;
-        private readonly IAppConfig config;
+        protected readonly IBaseCrudService<BR, DR, C, U> service;
+        protected readonly IAppConfig config;
 
         public BaseCrudController(IBaseCrudService<BR, DR, C, U> service, IAppConfig config)
         {

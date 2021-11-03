@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.EntityConfig;
 
 namespace TimeTable.DataAccess
 {
-    public class TimeTableDbContext : DbContext
+    public class TimeTableDbContext : IdentityDbContext
     {
         public TimeTableDbContext(DbContextOptions options) : base(options) { }
         public TimeTableDbContext() { }
@@ -15,11 +16,11 @@ namespace TimeTable.DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             CompanyEntityConfig.SetEntityBuilder(modelBuilder.Entity<CompanyEntity>());
             PersonEntityConfig.SetEntityBuilder(modelBuilder.Entity<PersonEntity>());
             TimeRecordEntityConfig.SetEntityBuilder(modelBuilder.Entity<TimeRecordEntity>());
-
-            base.OnModelCreating(modelBuilder);
         }
     }
 }

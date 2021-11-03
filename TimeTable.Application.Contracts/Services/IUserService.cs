@@ -1,0 +1,11 @@
+﻿using System.Threading.Tasks;
+using TimeTable.Business.Models;
+
+namespace TimeTable.Application.Contracts.Services
+{
+    public interface IUserService
+    {
+        Task<string> RegisterAsync(UserInfo userInfo);
+        Task<string> LoginAsync(UserInfo userInfo);
+    }
+}

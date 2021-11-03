@@ -1,0 +1,60 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using TimeTable.Application.Contracts.Configuration;
+using TimeTable.Application.Contracts.Services;
+using TimeTable.Business.Models;
+
+namespace TimeTable.Api.Controllers
+{
+    [Route("api/users")]
+    [ApiController]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService service;
+        private readonly IAppConfig config;
+
+        public UserController(IUserService service, IAppConfig config)
+        {
+            this.service = service;
+            this.config = config;
+        }
+
+        [HttpPost]
+        [Route("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Register(UserInfo userInfo)
+        {
+            if (userInfo == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            string token = await service.RegisterAsync(userInfo);
+            return Ok(token);
+        }
+
+        [HttpPost]
+        [Route("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Login(UserInfo userInfo)
+        {
+            if (userInfo == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            string token = await service.LoginAsync(userInfo);
+            if (string.IsNullOrWhiteSpace(token))
+                return BadRequest();
+            else
+                return Ok(token);
+        }
+    }
+}

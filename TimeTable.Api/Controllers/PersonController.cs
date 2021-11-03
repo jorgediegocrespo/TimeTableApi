@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/person")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseCrudController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
     {
         public PersonController(IPersonService service, IAppConfig config) : base(service, config)
@@ -18,6 +21,7 @@ namespace TimeTable.Api.Controllers
 
         [HttpGet]
         [Route("items")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get()
         {
