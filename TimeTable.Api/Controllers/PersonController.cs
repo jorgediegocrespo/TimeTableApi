@@ -16,12 +16,15 @@ namespace TimeTable.Api.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseCrudController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
     {
-        public PersonController(IPersonService service, IAppConfig config) : base(service, config)
-        { }
+        private readonly IUserService userService;
+
+        public PersonController(IPersonService service, IUserService userService, IAppConfig config) : base(service, config)
+        {
+            this.userService = userService;
+        }
 
         [HttpGet]
         [Route("items")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get()
         {
@@ -38,9 +41,23 @@ namespace TimeTable.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [AllowAnonymous]
         public override async Task<IActionResult> Post([FromBody] CreationPerson person)
         {
-            return await base.Post(person);
+            if (person == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            int createdId = await service.AddAsync(person);
+            string token = await userService.LoginAsync(new UserInfo
+            {
+                Email = person.Email,
+                Password = person.Password
+            });
+
+            return Created(nameof(GetById), new { id = createdId, token = token });
         }
 
         [HttpPut]

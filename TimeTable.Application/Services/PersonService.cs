@@ -15,11 +15,21 @@ namespace TimeTable.Application.Services
     public class PersonService : BaseCrudService<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>, IPersonService
     {
         private readonly ICompanyRepository companyRepository;
+        private readonly IUserService userService;
 
-        public PersonService(IUnitOfWork unitOfWork, IPersonRepository repository, IAppConfig appConfig, ICompanyRepository companyRepository)
+        public PersonService(IUnitOfWork unitOfWork, IPersonRepository repository, IAppConfig appConfig, ICompanyRepository companyRepository, IUserService userService)
             : base(unitOfWork, repository, appConfig, new PersonMapper())
         {
             this.companyRepository = companyRepository;
+            this.userService = userService;
+        }
+
+        public override async Task<int> AddAsync(CreationPerson businessModel, bool withTransaction = true)
+        {
+            if (withTransaction)
+                return await unitOfWork.SaveChangesInTransactionAsync(async () => await AddOperationsAsync(businessModel));
+            else
+                return await AddOperationsAsync(businessModel);
         }
 
         protected override async Task ValidateEntityToAddAsync(CreationPerson businessModel)
@@ -40,6 +50,18 @@ namespace TimeTable.Application.Services
             bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
             if (existsPersonName)
                 throw new NotValidItemException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
+        }
+
+        private async Task<int> AddOperationsAsync(CreationPerson businessModel)
+        {
+            int personId = await base.AddAsync(businessModel, false);
+            await userService.RegisterAsync(new UserInfo
+            {
+                Email = businessModel.Email,
+                Password = businessModel.Password
+            });
+
+            return personId;
         }
     }
 }
