@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TimeTable.DataAccess;
 
 namespace TimeTable.DataAccess.Migrations
 {
     [DbContext(typeof(TimeTableDbContext))]
-    partial class TimeTableDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211109152223_20211109-UserIdInPerson")]
+    partial class _20211109UserIdInPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,7 +243,7 @@ namespace TimeTable.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CompanyId")
+                    b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAdmin")
@@ -341,7 +343,9 @@ namespace TimeTable.DataAccess.Migrations
                 {
                     b.HasOne("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", "Company")
                         .WithMany("People")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()

@@ -8,7 +8,7 @@ namespace TimeTable.Business.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsAdmin { get; set; }
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
     }
 
     public class DetailedReadingPerson : BasicReadingPerson, IDetailedReadingBusinessModel
@@ -26,8 +26,7 @@ namespace TimeTable.Business.Models
         [Required]
         public bool IsAdmin { get; set; }
 
-        [Required]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
 
         [Required]
         [EmailAddress]

@@ -18,9 +18,7 @@ namespace TimeTable.DataAccess.EntityConfig
 
             entityBuilder.HasOne(x => x.Company)
                 .WithMany(x => x.People)
-                .IsRequired(true)
-                .HasForeignKey(x => x.CompanyId)
-                .IsRequired(true);
+                .HasForeignKey(x => x.CompanyId);
 
             entityBuilder.HasMany(x => x.TimeRecords).WithOne(x => x.Person);
         }

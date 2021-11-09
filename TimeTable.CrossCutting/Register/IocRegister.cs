@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TimeTable.Application.Configuration;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
@@ -28,6 +30,8 @@ namespace TimeTable.CrossCutting.Register
 
         public static void RegisterIdentity(IServiceCollection services)
         {
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<TimeTableDbContext>()
                     .AddDefaultTokenProviders();

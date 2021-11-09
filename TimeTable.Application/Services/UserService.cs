@@ -32,7 +32,7 @@ namespace TimeTable.Application.Services
             IdentityUser user = new IdentityUser
             {
                 UserName = userInfo.Email,
-                Email = userInfo.Email
+                Email = userInfo.Email,
             };
 
             var result = await userManager.CreateAsync(user, userInfo.Password);
