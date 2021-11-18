@@ -6,7 +6,7 @@ using TimeTable.DataAccess.Repositories.Base;
 
 namespace TimeTable.DataAccess.Repositories
 {
-    public class PersonRepository : BaseRepository<PersonEntity>, IPersonRepository
+    public class PersonRepository : BaseCrudRepository<PersonEntity>, IPersonRepository
     {
         protected override DbSet<PersonEntity> DbEntity => dbContext.People;
 

@@ -1,8 +1,13 @@
-﻿using TimeTable.DataAccess.Contracts.Entities;
+﻿using System.Threading.Tasks;
+using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories
 {
-    public interface ICompanyRepository : IRepository<CompanyEntity>
-    { }
+    public interface ICompanyRepository : IBaseRepository<CompanyEntity>
+    {
+        Task AddAsync(CompanyEntity entity);
+        Task<CompanyEntity> GetAsync();
+        Task UpdateAsync(CompanyEntity entity);
+    }
 }

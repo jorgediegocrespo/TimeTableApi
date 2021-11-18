@@ -1,6 +1,4 @@
-﻿using Polly;
-using Polly.Retry;
-using System;
+﻿using Polly.Retry;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +14,7 @@ using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.Application.Services.Base
 {
-    public abstract class BaseCrudService<BR, DR, C, U, E> : IBaseCrudService<BR, DR, C, U>
+    public abstract class BaseCrudService<BR, DR, C, U, E> : BaseService, IBaseCrudService<BR, DR, C, U>
         where BR : IBasicReadingBusinessModel
         where DR : IDetailedReadingBusinessModel
         where C : ICreationBusinessModel
@@ -24,18 +22,17 @@ namespace TimeTable.Application.Services.Base
         where E : IBaseWithIdEntity
     {
         protected readonly IUnitOfWork unitOfWork;
-        protected readonly IRepository<E> repository;
-        protected readonly IAppConfig appConfig;
+        protected readonly ICrudRepository<E> repository;
         protected readonly IMapper<BR, DR, C, U, E> mapper;
 
         public BaseCrudService(IUnitOfWork unitOfWork, 
-                               IRepository<E> repository, 
+                               ICrudRepository<E> repository, 
                                IAppConfig appConfig, 
-                               IMapper<BR, DR, C, U, E> mapper)
+                               IMapper<BR, DR, C, U, E> mapper) 
+            : base(appConfig)
         {
             this.unitOfWork = unitOfWork;
             this.repository = repository;
-            this.appConfig = appConfig;
             this.mapper = mapper;
         }
 
@@ -144,15 +141,6 @@ namespace TimeTable.Application.Services.Base
         {
             E entity = mapper.MapUpdating(businessModel);
             return Task.FromResult(entity);
-        }
-
-        protected AsyncRetryPolicy GetRetryPolicy()
-        {
-            int maxTrys = appConfig.MaxTrys;
-            TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
-            return Policy
-                .Handle<Exception>(ex => !(ex is NotValidItemException) && !(ex is ForbidenActionException))
-                .WaitAndRetryAsync(maxTrys, i => timeToWait);
         }
     }
 }

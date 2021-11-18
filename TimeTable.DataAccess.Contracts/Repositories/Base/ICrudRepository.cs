@@ -7,7 +7,8 @@ using TimeTable.DataAccess.Contracts.Entities.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories.Base
 {
-    public interface IRepository<T> where T : IBaseWithIdEntity
+    public interface ICrudRepository<T> : IBaseRepository<T> 
+        where T : IBaseWithIdEntity
     {
         Task<bool> ExistsAsync(int id);
         Task<bool> ExistsAsync([NotNullAttribute] Expression<Func<T, bool>> expression);

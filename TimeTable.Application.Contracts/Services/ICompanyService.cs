@@ -1,8 +1,10 @@
-﻿using TimeTable.Application.Contracts.Services.Base;
+﻿using System.Threading.Tasks;
 using TimeTable.Business.Models;
 
 namespace TimeTable.Application.Contracts.Services
 {
-    public interface ICompanyService : IBaseCrudService<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
-    { }
+    public interface ICompanyService 
+    {
+        Task<BasicReadingCompany> GetAsync();
+    }
 }

@@ -4,7 +4,7 @@ using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories
 {
-    public interface IPersonRepository : IRepository<PersonEntity>
+    public interface IPersonRepository : ICrudRepository<PersonEntity>
     {
         Task<PersonEntity> GetByUserIdAsync(string userId);
     }
