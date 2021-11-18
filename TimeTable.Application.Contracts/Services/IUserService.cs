@@ -7,5 +7,11 @@ namespace TimeTable.Application.Contracts.Services
     {
         Task<string> RegisterAsync(UserInfo userInfo);
         Task<string> LoginAsync(UserInfo userInfo);
+        string GetContextUserId();
+        Task<int?> GetContextPersonIdAsync();
+        Task<int?> GetContextCompanyIdAsync();
+        string GetContextUserName();
+        string GetContextUserEmail();
+        Task DeleteAsync(string userId);
     }
 }

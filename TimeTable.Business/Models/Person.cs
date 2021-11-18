@@ -7,7 +7,7 @@ namespace TimeTable.Business.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool IsAdmin { get; set; }
+        public bool? IsAdmin { get; set; }
         public int? CompanyId { get; set; }
     }
 
@@ -22,9 +22,6 @@ namespace TimeTable.Business.Models
         [MaxLength(450)]
         [MinLength(4)]
         public string Name { get; set; }
-
-        [Required]
-        public bool IsAdmin { get; set; }
 
         public int? CompanyId { get; set; }
 
@@ -44,8 +41,5 @@ namespace TimeTable.Business.Models
         [MaxLength(450)]
         [MinLength(4)]
         public string Name { get; set; }
-
-        [Required]
-        public bool IsAdmin { get; set; }
     }
 }

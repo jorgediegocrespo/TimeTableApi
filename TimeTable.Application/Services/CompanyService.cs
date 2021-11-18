@@ -1,10 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Mappers;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities;
@@ -15,11 +19,17 @@ namespace TimeTable.Application.Services
     public class CompanyService : BaseCrudService<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany, CompanyEntity>, ICompanyService
     {
         private readonly IPersonRepository personRepository;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public CompanyService(IUnitOfWork unitOfWork, ICompanyRepository repository, IAppConfig appConfig, IPersonService personService, IPersonRepository personRepository)
+        public CompanyService(IUnitOfWork unitOfWork, 
+                              ICompanyRepository repository, 
+                              IAppConfig appConfig, 
+                              IPersonRepository personRepository, 
+                              IHttpContextAccessor httpContextAccessor)
             : base(unitOfWork, repository, appConfig, new CompanyMapper())
         {
             this.personRepository = personRepository;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         protected override async Task ValidateEntityToAddAsync(CreationCompany businessModel)
@@ -27,11 +37,7 @@ namespace TimeTable.Application.Services
             await base.ValidateEntityToAddAsync(businessModel);
             bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
             if (existsCompanyName)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
-
-            bool existsPerson = await personRepository.ExistsAsync(x => x.Id == businessModel.CreatorId);
-            if (!existsPerson)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NEED_CREATOR, $"There is not any person with the id {businessModel.CreatorId}");
+                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");            
         }
 
         protected override async Task ValidateEntityToUpdateAsync(UpdatingCompany businessModel)

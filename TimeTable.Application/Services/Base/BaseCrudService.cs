@@ -28,7 +28,10 @@ namespace TimeTable.Application.Services.Base
         protected readonly IAppConfig appConfig;
         protected readonly IMapper<BR, DR, C, U, E> mapper;
 
-        public BaseCrudService(IUnitOfWork unitOfWork, IRepository<E> repository, IAppConfig appConfig, IMapper<BR, DR, C, U, E> mapper)
+        public BaseCrudService(IUnitOfWork unitOfWork, 
+                               IRepository<E> repository, 
+                               IAppConfig appConfig, 
+                               IMapper<BR, DR, C, U, E> mapper)
         {
             this.unitOfWork = unitOfWork;
             this.repository = repository;
@@ -42,17 +45,19 @@ namespace TimeTable.Application.Services.Base
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
+                    await ValidateToGetAllAsync();
                     IEnumerable<E> allEntities = await repository.GetAllAsync();
                     return allEntities.Select(o => mapper.MapBasicReading(o));
                 });
         }
-
+        
         public virtual async Task<DR> GetAsync(int id)
         {
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
+                    await ValidateToGetAsync(id);
                     E entity = await repository.GetAsync(id);
                     return mapper.MapDetailedReading(entity);
                 });
@@ -67,16 +72,11 @@ namespace TimeTable.Application.Services.Base
         public virtual async Task<int> AddAsync(C businessModel, bool withTransaction = true)
         {
             await ValidateEntityToAddAsync(businessModel);
-            var entity = mapper.MapCreating(businessModel);
+            var entity = await MapCreatingAsync(businessModel);
             await repository.AddAsync(entity);
             await unitOfWork.SaveChangesAsync();
             return entity.Id;
-        }
-
-        protected virtual Task ValidateEntityToAddAsync(C businessModel)
-        {
-            return Task.CompletedTask;
-        }
+        }    
 
         public virtual async Task UpdateAsync(U businessModel)
         {
@@ -87,15 +87,9 @@ namespace TimeTable.Application.Services.Base
         public virtual async Task UpdateAsync(U businessModel, bool withTransaction)
         {
             await ValidateEntityToUpdateAsync(businessModel);
-            await repository.UpdateAsync(mapper.MapUpdating(businessModel));
+            var entity = await MapUpdatingAsync(businessModel);
+            await repository.UpdateAsync(entity);
             await unitOfWork.SaveChangesAsync();
-        }
-
-        protected virtual async Task ValidateEntityToUpdateAsync(U businessModel)
-        {
-            bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
-            if (!existsItem)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
         }
 
         public virtual async Task DeleteAsync(int id)
@@ -111,6 +105,28 @@ namespace TimeTable.Application.Services.Base
             await unitOfWork.SaveChangesAsync();
         }
 
+        protected virtual Task ValidateToGetAllAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task ValidateToGetAsync(int id)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task ValidateEntityToAddAsync(C businessModel)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual async Task ValidateEntityToUpdateAsync(U businessModel)
+        {
+            bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
+            if (!existsItem)
+                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
+        }
+
         protected virtual async Task ValidateEntityToDeleteAsync(int id)
         {
             bool existsItem = await repository.ExistsAsync(x => x.Id == id);
@@ -118,11 +134,25 @@ namespace TimeTable.Application.Services.Base
                 throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {id}");
         }
 
+        protected virtual Task<E> MapCreatingAsync(C businessModel)
+        {
+            E entity = mapper.MapCreating(businessModel);
+            return Task.FromResult(entity);
+        }
+
+        protected virtual Task<E> MapUpdatingAsync(U businessModel)
+        {
+            E entity = mapper.MapUpdating(businessModel);
+            return Task.FromResult(entity);
+        }
+
         protected AsyncRetryPolicy GetRetryPolicy()
         {
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
-            return Policy.Handle<Exception>(ex => !(ex is NotValidItemException)).WaitAndRetryAsync(maxTrys, i => timeToWait);
+            return Policy
+                .Handle<Exception>(ex => !(ex is NotValidItemException) && !(ex is ForbidenActionException))
+                .WaitAndRetryAsync(maxTrys, i => timeToWait);
         }
     }
 }

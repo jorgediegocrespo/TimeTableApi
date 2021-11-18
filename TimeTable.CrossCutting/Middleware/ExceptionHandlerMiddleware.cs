@@ -40,6 +40,9 @@ namespace TimeTable.CrossCutting.Middleware
                     statusCode = HttpStatusCode.Conflict;
                     errorDescription = notValidItemException.Description;
                     break;
+                case ForbidenActionException forbidenActionException:
+                    statusCode = HttpStatusCode.Forbidden;
+                    break;
             }
 
             context.Response.ContentType = "application/json";

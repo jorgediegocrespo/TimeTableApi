@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 
 namespace TimeTable.Api.Controllers
@@ -24,7 +25,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<BasicReadingCompany>), StatusCodes.Status200OK)]
         public override async Task<IActionResult> Get()
         {
-            return await base.Get();
+            return await Task.FromResult(Forbid());
         }
 
         [HttpGet]
@@ -37,6 +38,7 @@ namespace TimeTable.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [Authorize(Policy = PolicyConsts.NO_ADMIN)]
         public override async Task<IActionResult> Post([FromBody] CreationCompany company)
         {
             return await base.Post(company);
@@ -44,12 +46,14 @@ namespace TimeTable.Api.Controllers
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [Authorize(Policy = PolicyConsts.ADMIN)]
         public override async Task<IActionResult> Put([FromBody] UpdatingCompany company)
         {
             return await base.Put(company);
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = PolicyConsts.ADMIN)]
         public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);

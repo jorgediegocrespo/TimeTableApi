@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 
 namespace TimeTable.Api.Controllers
@@ -16,19 +17,33 @@ namespace TimeTable.Api.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseCrudController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
     {
+        private readonly IPersonService personService;
         private readonly IUserService userService;
+        
 
         public PersonController(IPersonService service, IUserService userService, IAppConfig config) : base(service, config)
         {
+            personService = service;
             this.userService = userService;
         }
 
         [HttpGet]
         [Route("items")]
         [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyConsts.ADMIN)]
         public override async Task<IActionResult> Get()
         {
-            return await base.Get();
+            return await Task.FromResult(Forbid());
+        }
+
+        [HttpGet]
+        [Route("itemsByCompany/{companyId}")]
+        [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyConsts.ADMIN)]
+        public async Task<IActionResult> GetByCompanyId(int companyId)
+        {
+            var entities = await personService.GetAllAsync();
+            return Ok(entities);
         }
 
         [HttpGet]
@@ -50,7 +65,7 @@ namespace TimeTable.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            int createdId = await service.AddAsync(person);
+            int createdId = await personService.AddAsync(person);
             string token = await userService.LoginAsync(new UserInfo
             {
                 Email = person.Email,

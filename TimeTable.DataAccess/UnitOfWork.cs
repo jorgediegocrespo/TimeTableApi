@@ -36,5 +36,22 @@ namespace TimeTable.DataAccess
                 }
             }
         }
+
+        public async Task ExecuteInTransactionAsync(Func<Task> operation)
+        {
+            using (var transaction = await timeTableDbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await operation();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
     }
 }
