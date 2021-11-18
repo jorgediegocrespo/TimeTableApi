@@ -231,7 +231,7 @@ namespace TimeTable.DataAccess.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Companies");
+                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
@@ -240,9 +240,6 @@ namespace TimeTable.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
 
                     b.Property<bool?>("IsAdmin")
                         .HasColumnType("bit");
@@ -255,8 +252,6 @@ namespace TimeTable.DataAccess.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("UserId");
 
@@ -339,15 +334,9 @@ namespace TimeTable.DataAccess.Migrations
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
                 {
-                    b.HasOne("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", "Company")
-                        .WithMany("People")
-                        .HasForeignKey("CompanyId");
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Company");
 
                     b.Navigation("User");
                 });
@@ -361,11 +350,6 @@ namespace TimeTable.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", b =>
-                {
-                    b.Navigation("People");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>

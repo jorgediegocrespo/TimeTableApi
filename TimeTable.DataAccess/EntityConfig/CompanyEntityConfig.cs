@@ -8,7 +8,7 @@ namespace TimeTable.DataAccess.EntityConfig
     {
         public static void SetEntityBuilder(EntityTypeBuilder<CompanyEntity> entityBuilder)
         {
-            entityBuilder.ToTable("Companies");
+            entityBuilder.ToTable("Company");
 
             entityBuilder.HasKey(x => x.Id);
             entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -16,8 +16,6 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.Property(x => x.Name).IsRequired(true);
 
             entityBuilder.HasIndex(a => a.Name).IsUnique(true);
-
-            entityBuilder.HasMany(x => x.People).WithOne(x => x.Company);
         }
     }
 }

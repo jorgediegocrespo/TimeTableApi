@@ -8,13 +8,10 @@ namespace TimeTable.Business.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public bool? IsAdmin { get; set; }
-        public int? CompanyId { get; set; }
     }
 
     public class DetailedReadingPerson : BasicReadingPerson, IDetailedReadingBusinessModel
-    {
-        public BasicReadingCompany Company { get; set; }
-    }
+    { }
 
     public class CreationPerson : ICreationBusinessModel
     {
@@ -22,8 +19,6 @@ namespace TimeTable.Business.Models
         [MaxLength(450)]
         [MinLength(4)]
         public string Name { get; set; }
-
-        public int? CompanyId { get; set; }
 
         [Required]
         [EmailAddress]

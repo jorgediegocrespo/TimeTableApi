@@ -12,8 +12,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin,
-                CompanyId = entity.CompanyId
+                IsAdmin = entity.IsAdmin
             };
         }
 
@@ -23,8 +22,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin,
-                CompanyId = entity.CompanyId
+                IsAdmin = entity.IsAdmin
             };
         }
 
@@ -32,8 +30,7 @@ namespace TimeTable.Application.Contracts.Mappers
         {
             return new PersonEntity()
             {
-                Name = businessModel.Name,
-                CompanyId = businessModel.CompanyId
+                Name = businessModel.Name
             };
         }        
 

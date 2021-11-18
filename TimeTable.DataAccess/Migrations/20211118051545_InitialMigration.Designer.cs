@@ -10,8 +10,8 @@ using TimeTable.DataAccess;
 namespace TimeTable.DataAccess.Migrations
 {
     [DbContext(typeof(TimeTableDbContext))]
-    [Migration("20211029041259_20211029-InitialMigration")]
-    partial class _20211029InitialMigration
+    [Migration("20211118051545_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -233,7 +233,7 @@ namespace TimeTable.DataAccess.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Companies");
+                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
@@ -243,22 +243,19 @@ namespace TimeTable.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAdmin")
+                    b.Property<bool?>("IsAdmin")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("People");
                 });
@@ -339,13 +336,11 @@ namespace TimeTable.DataAccess.Migrations
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>
                 {
-                    b.HasOne("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", "Company")
-                        .WithMany("People")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("Company");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.TimeRecordEntity", b =>
@@ -357,11 +352,6 @@ namespace TimeTable.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.CompanyEntity", b =>
-                {
-                    b.Navigation("People");
                 });
 
             modelBuilder.Entity("TimeTable.DataAccess.Contracts.Entities.PersonEntity", b =>

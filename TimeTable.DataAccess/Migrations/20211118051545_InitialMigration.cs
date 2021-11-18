@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TimeTable.DataAccess.Migrations
 {
-    public partial class _20211029InitialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -47,7 +47,7 @@ namespace TimeTable.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Companies",
+                name: "Company",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -56,7 +56,7 @@ namespace TimeTable.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.Id);
+                    table.PrimaryKey("PK_Company", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -171,19 +171,19 @@ namespace TimeTable.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    CompanyId = table.Column<int>(type: "int", nullable: false)
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_People", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_People_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
+                        name: "FK_People_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -247,21 +247,15 @@ namespace TimeTable.DataAccess.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Companies_Name",
-                table: "Companies",
+                name: "IX_Company_Name",
+                table: "Company",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_People_CompanyId",
+                name: "IX_People_UserId",
                 table: "People",
-                column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_People_Name",
-                table: "People",
-                column: "Name",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeRecords_PersonId",
@@ -287,19 +281,19 @@ namespace TimeTable.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Company");
+
+            migrationBuilder.DropTable(
                 name: "TimeRecords");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "People");
 
             migrationBuilder.DropTable(
-                name: "Companies");
+                name: "AspNetUsers");
         }
     }
 }

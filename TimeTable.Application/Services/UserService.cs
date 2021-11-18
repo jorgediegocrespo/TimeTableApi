@@ -77,19 +77,6 @@ namespace TimeTable.Application.Services
             return person.Id;
         }
 
-        public async Task<int?> GetContextCompanyIdAsync()
-        {
-            string userId = GetContextUserId();
-            if (userId == null)
-                return null;
-
-            PersonEntity person = await personRepository.GetByUserIdAsync(userId);
-            if (person == null)
-                return null;
-
-            return person.CompanyId;
-        }
-
         public string GetContextUserName()
         {
             return httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);

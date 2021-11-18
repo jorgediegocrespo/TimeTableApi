@@ -11,11 +11,8 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public string Name { get; set; }
 
         public string UserId { get; set; }
-        public IdentityUser User { get; set; }
+        public virtual IdentityUser User { get; set; }
 
-        public int? CompanyId { get; set; }
-        public virtual CompanyEntity Company { get; set; }
-
-        public List<TimeRecordEntity> TimeRecords { get; set; }
+        public virtual List<TimeRecordEntity> TimeRecords { get; set; }
     }
 }
