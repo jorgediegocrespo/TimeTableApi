@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using TimeTable.CrossCutting.Register;
 
 namespace TimeTable.Api
 {
@@ -7,7 +8,7 @@ namespace TimeTable.Api
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().BuildContext().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
