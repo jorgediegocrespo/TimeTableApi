@@ -5,12 +5,21 @@ namespace TimeTable.Application.Contracts.Mappers
 {
     public class CompanyMapper
     {
-        public BasicReadingCompany MapBasicReading(CompanyEntity entity)
+        public Company MapReading(CompanyEntity entity)
         {
-            return new BasicReadingCompany()
+            return new Company()
             {
                 Id = entity.Id,
                 Name = entity.Name,
+            };
+        }
+
+        public CompanyEntity MapUpdating(Company businessModel)
+        {
+            return new CompanyEntity()
+            {
+                Id = businessModel.Id,
+                Name = businessModel.Name,
             };
         }
     }

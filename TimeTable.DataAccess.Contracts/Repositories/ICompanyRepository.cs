@@ -6,7 +6,6 @@ namespace TimeTable.DataAccess.Contracts.Repositories
 {
     public interface ICompanyRepository : IBaseRepository<CompanyEntity>
     {
-        Task AddAsync(CompanyEntity entity);
         Task<CompanyEntity> GetAsync();
         Task UpdateAsync(CompanyEntity entity);
     }

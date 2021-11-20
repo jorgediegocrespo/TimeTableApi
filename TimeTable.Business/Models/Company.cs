@@ -2,7 +2,7 @@
 
 namespace TimeTable.Business.Models
 {
-    public class BasicReadingCompany
+    public class Company : IBaseBusinessModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

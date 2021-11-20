@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 
 namespace TimeTable.Api.Controllers
@@ -24,14 +25,30 @@ namespace TimeTable.Api.Controllers
 
         [HttpGet]
         [Route("item")]
-        [ProducesResponseType(typeof(BasicReadingCompany), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Company), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
-            BasicReadingCompany entity = await service.GetAsync();
+            Company entity = await service.GetAsync();
             if (entity == null)
                 return NotFound();
             else
                 return Ok(entity);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyConsts.ADMIN)]
+        public virtual async Task<IActionResult> Put(Company item)
+        {
+            if (item == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            await service.UpdateAsync(item);
+            return NoContent();
         }
     }
 }

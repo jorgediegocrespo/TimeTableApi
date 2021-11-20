@@ -2,11 +2,12 @@
 using Polly.Retry;
 using System;
 using TimeTable.Application.Contracts.Configuration;
+using TimeTable.Application.Contracts.Services.Base;
 using TimeTable.Application.Exceptions;
 
 namespace TimeTable.Application.Services.Base
 {
-    public abstract class BaseService
+    public abstract class BaseService : IBaseService
     {
         protected readonly IAppConfig appConfig;
 

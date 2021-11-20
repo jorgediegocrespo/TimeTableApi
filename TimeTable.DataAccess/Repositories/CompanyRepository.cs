@@ -13,11 +13,6 @@ namespace TimeTable.DataAccess.Repositories
 
         protected override DbSet<CompanyEntity> DbEntity => dbContext.Companies;
 
-        public virtual async Task AddAsync(CompanyEntity entity)
-        {
-            await DbEntity.AddAsync(entity);
-        }
-
         public Task<CompanyEntity> GetAsync() => DbEntity.FirstOrDefaultAsync();
 
         public virtual Task UpdateAsync(CompanyEntity entity)
