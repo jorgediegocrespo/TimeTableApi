@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,13 @@ namespace TimeTable.CrossCutting.Register
                 var context = services.GetService<TimeTableDbContext>();
                 context.Database.Migrate();
 
+
+                var userManager = services.GetService<UserManager<IdentityUser>>();
+                var rolesManager = services.GetService<RoleManager<IdentityRole>>();
+
                 new CompanySeed().SeedAsync(context, configuration).Wait();
+                new RolesSeed(rolesManager).SeedAsync(context, configuration).Wait();
+                new PeopleSeed(userManager, rolesManager).SeedAsync(context, configuration).Wait();
             }
 
             return host;

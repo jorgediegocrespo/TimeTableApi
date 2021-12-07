@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TimeTable.Business\TimeTable.Business.csproj" />
     <ProjectReference Include="..\TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj" />
   </ItemGroup>
 

@@ -38,11 +38,11 @@ namespace TimeTable.Application.Services
             this.personRepository = personRepository;
         }
 
-        public async Task<string> RegisterAsync(UserInfo userInfo)
+        public async Task<string> RegisterAsync(RegisterUserInfo userInfo)
         {
             IdentityUser user = new IdentityUser
             {
-                UserName = userInfo.Email,
+                UserName = userInfo.UserName,
                 Email = userInfo.Email,
             };
 
@@ -53,9 +53,9 @@ namespace TimeTable.Application.Services
             return await userManager.GetUserIdAsync(user);
         }
 
-        public async Task<string> LoginAsync(UserInfo userInfo)
+        public async Task<string> LoginAsync(LoginUserInfo userInfo)
         {
-            SignInResult result = await signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, false, false);
+            SignInResult result = await signInManager.PasswordSignInAsync(userInfo.UserName, userInfo.Password, false, false);
             return result.Succeeded ? GetToken(userInfo) : null;
         }
 
@@ -93,11 +93,11 @@ namespace TimeTable.Application.Services
             await userManager.DeleteAsync(user);
         }
 
-        private string GetToken(UserInfo userInfo)
+        private string GetToken(LoginUserInfo userInfo)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim("email", userInfo.Email) //TODO It is not necessary
+                new Claim("userName", userInfo.UserName) //TODO It is not necessary
             };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtKey"]));

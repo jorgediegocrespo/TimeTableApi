@@ -30,7 +30,7 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items")]
         [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyConsts.ADMIN)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = RolesConsts.ADMIN)]
         public override async Task<IActionResult> Get()
         {
             return await Task.FromResult(Forbid());
@@ -39,7 +39,7 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("itemsByCompany/{companyId}")]
         [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyConsts.ADMIN)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = RolesConsts.ADMIN)]
         public async Task<IActionResult> GetByCompanyId(int companyId)
         {
             var entities = await personService.GetAllAsync();
@@ -66,9 +66,9 @@ namespace TimeTable.Api.Controllers
                 return BadRequest();
 
             int createdId = await personService.AddAsync(person);
-            string token = await userService.LoginAsync(new UserInfo
+            string token = await userService.LoginAsync(new LoginUserInfo
             {
-                Email = person.Email,
+                UserName = person.Name,
                 Password = person.Password
             });
 

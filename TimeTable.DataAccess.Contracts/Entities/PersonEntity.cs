@@ -7,7 +7,6 @@ namespace TimeTable.DataAccess.Contracts.Entities
     public class PersonEntity : IBaseWithIdEntity
     {
         public int Id { get; set; }
-        public bool? IsAdmin { get; set; }
         public string Name { get; set; }
 
         public string UserId { get; set; }

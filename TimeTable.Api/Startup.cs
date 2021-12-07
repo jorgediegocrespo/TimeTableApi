@@ -43,11 +43,12 @@ namespace TimeTable.Api
             SwaggerConfig.AddRegistration(services);
             IocRegister.RegisterIdentity(services);
 
-            services.AddAuthorization(x =>
-            {
-                x.AddPolicy(PolicyConsts.ADMIN, p => p.RequireClaim(ClaimsConsts.ADMIN, true.ToString()));
-                x.AddPolicy(PolicyConsts.NO_ADMIN, p => p.RequireClaim(ClaimsConsts.ADMIN, string.Empty));
-            });
+            //TODO Remove
+            //services.AddAuthorization(x =>
+            //{
+            //    x.AddPolicy(PolicyConsts.ADMIN, p => p.RequireClaim(ClaimsConsts.ADMIN, true.ToString()));
+            //    x.AddPolicy(PolicyConsts.NO_ADMIN, p => p.RequireClaim(ClaimsConsts.ADMIN, string.Empty));
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

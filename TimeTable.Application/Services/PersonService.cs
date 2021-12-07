@@ -83,9 +83,10 @@ namespace TimeTable.Application.Services
         private async Task<int> AddOperationsAsync(CreationPerson businessModel)
         {
             await ValidateEntityToAddAsync(businessModel);
-            string userId = await userService.RegisterAsync(new UserInfo
+            string userId = await userService.RegisterAsync(new RegisterUserInfo
             {
                 Email = businessModel.Email,
+                UserName = businessModel.Name,
                 Password = businessModel.Password,
             });
             

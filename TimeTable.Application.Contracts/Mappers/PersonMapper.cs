@@ -12,7 +12,6 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin
             };
         }
 
@@ -22,7 +21,6 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin
             };
         }
 

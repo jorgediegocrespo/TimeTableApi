@@ -2,8 +2,20 @@
 
 namespace TimeTable.Business.Models
 {
-    public class UserInfo
+    public class LoginUserInfo
     {
+        [Required]
+        public string UserName { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
+
+    public class RegisterUserInfo
+    {
+        [Required]
+        public string UserName { get; set; }
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }

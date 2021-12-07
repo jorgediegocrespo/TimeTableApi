@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TimeTable.Application.Contracts.Configuration;
@@ -21,6 +20,7 @@ namespace TimeTable.Api.Controllers
             this.config = config;
         }
 
+        //TODO Remove
         //[HttpPost]
         //[Route("register")]
         //[ProducesResponseType(StatusCodes.Status200OK)]
@@ -42,7 +42,7 @@ namespace TimeTable.Api.Controllers
         [Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Login(UserInfo userInfo)
+        public async Task<IActionResult> Login(LoginUserInfo userInfo)
         {
             if (userInfo == null)
                 return BadRequest();
