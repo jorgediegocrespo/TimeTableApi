@@ -56,7 +56,7 @@ namespace TimeTable.Application.Services
         public async Task<string> LoginAsync(LoginUserInfo userInfo)
         {
             SignInResult result = await signInManager.PasswordSignInAsync(userInfo.UserName, userInfo.Password, false, false);
-            return result.Succeeded ? GetToken(userInfo) : null;
+            return result.Succeeded ? await GetToken(userInfo) : null;
         }
 
         public string GetContextUserId()
@@ -93,19 +93,27 @@ namespace TimeTable.Application.Services
             await userManager.DeleteAsync(user);
         }
 
-        private string GetToken(LoginUserInfo userInfo)
+        private async Task<string> GetToken(LoginUserInfo userInfo)
         {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim("userName", userInfo.UserName) //TODO It is not necessary
-            };
-
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtKey"]));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            IList<Claim> claims = await GetUserClaims(userInfo.UserName);
             DateTime expiresDate = DateTime.UtcNow.AddMinutes(30);
             JwtSecurityToken securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiresDate, signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        }
+
+        private async Task<IList<Claim>> GetUserClaims(string userName)
+        {
+            IdentityUser user = await userManager.FindByNameAsync(userName);
+            IList<string> roles = await userManager.GetRolesAsync(user);
+            IList<Claim> claims = await userManager.GetClaimsAsync(user);
+
+            foreach(var rol in roles)
+                claims.Add(new Claim(ClaimTypes.Role, rol));
+
+            return claims;
         }
     }
 }

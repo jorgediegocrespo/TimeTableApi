@@ -43,7 +43,7 @@ namespace TimeTable.Api.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = RolesConsts.ADMIN)]
         public virtual async Task<IActionResult> Put(Company item)
         {
             if (item == null)

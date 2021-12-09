@@ -20,24 +20,6 @@ namespace TimeTable.Api.Controllers
             this.config = config;
         }
 
-        //TODO Remove
-        //[HttpPost]
-        //[Route("register")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //public async Task<IActionResult> Register(UserInfo userInfo)
-        //{
-        //    if (userInfo == null)
-        //        return BadRequest();
-
-        //    if (!ModelState.IsValid)
-        //        return BadRequest();
-
-        //    string token = await service.RegisterAsync(userInfo);
-        //    return Ok(token);
-        //}
-
         [HttpPost]
         [Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
