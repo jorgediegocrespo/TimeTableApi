@@ -110,7 +110,11 @@ namespace TimeTable.Application.Services
             IList<string> roles = await userManager.GetRolesAsync(user);
             IList<Claim> claims = await userManager.GetClaimsAsync(user);
 
-            foreach(var rol in roles)
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+            claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));            
+
+            foreach (var rol in roles)
                 claims.Add(new Claim(ClaimTypes.Role, rol));
 
             return claims;

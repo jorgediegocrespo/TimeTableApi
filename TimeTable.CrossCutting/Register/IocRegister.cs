@@ -34,7 +34,6 @@ namespace TimeTable.CrossCutting.Register
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<TimeTableDbContext>()
-                    .AddRoleManager<RoleManager<IdentityRole>>()
                     .AddDefaultTokenProviders();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Polly.Retry;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
@@ -15,25 +16,21 @@ namespace TimeTable.Application.Services
 {
     public class PersonService : BaseCrudService<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>, IPersonService
     {
-        private readonly ICompanyRepository companyRepository;
         private readonly IUserService userService;
         
         public PersonService(IUnitOfWork unitOfWork, 
                              IPersonRepository repository, 
                              IAppConfig appConfig, 
-                             ICompanyRepository companyRepository, 
                              IUserService userService)
             : base(unitOfWork, repository, appConfig, new PersonMapper())
         {
-            this.companyRepository = companyRepository;
             this.userService = userService;
         }
 
-        private IPersonRepository PersonRepository => (IPersonRepository)repository;
-
-        public override Task<IEnumerable<BasicReadingPerson>> GetAllAsync()
+        public virtual async Task<DetailedReadingPerson> GetOwnAsync()
         {
-            throw new ForbidenActionException();
+            int? id = await userService.GetContextPersonIdAsync();
+            return await GetAsync(id.Value);
         }
 
         public override async Task<int> AddAsync(CreationPerson businessModel, bool withTransaction = true)
@@ -42,6 +39,12 @@ namespace TimeTable.Application.Services
                 return await unitOfWork.SaveChangesInTransactionAsync(async () => await AddOperationsAsync(businessModel));
             else
                 return await AddOperationsAsync(businessModel);
+        }
+
+        public async Task DeleteOwnAsync()
+        {
+            int? id = await userService.GetContextPersonIdAsync();
+            await DeleteAsync(id.Value);
         }
 
         public override async Task DeleteAsync(int id, bool withTransaction)

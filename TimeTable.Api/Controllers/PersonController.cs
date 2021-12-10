@@ -30,33 +30,32 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items")]
         [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = RolesConsts.ADMIN)]
-        public override async Task<IActionResult> Get()
+        [Authorize(Roles = RolesConsts.ADMIN)]
+        public override Task<IActionResult> Get()
         {
-            return await Task.FromResult(Forbid());
-        }
-
-        [HttpGet]
-        [Route("itemsByCompany/{companyId}")]
-        [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> GetByCompanyId(int companyId)
-        {
-            var entities = await personService.GetAllAsync();
-            return Ok(entities);
+            return base.Get();
         }
 
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
+        [Authorize(Roles = RolesConsts.ADMIN)]
         public override async Task<IActionResult> GetById(int id)
         {
             return await base.GetById(id);
         }
 
+        [HttpGet]
+        [Route("own")]
+        [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetOwn()
+        {
+            return Ok(await personService.GetOwnAsync());
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [AllowAnonymous]
+        [Authorize(Roles = RolesConsts.ADMIN)]
         public override async Task<IActionResult> Post([FromBody] CreationPerson person)
         {
             if (person == null)
@@ -82,10 +81,20 @@ namespace TimeTable.Api.Controllers
             return await base.Put(person);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize(Roles = RolesConsts.ADMIN)]
         public override async Task<IActionResult> Delete(int id)
         {
             return await base.Delete(id);
+        }
+
+        [HttpDelete]
+        [Route("own")]
+        public async Task<IActionResult> DeleteOwn()
+        {
+            await personService.DeleteOwnAsync();
+            return NoContent();
         }
     }
 }
