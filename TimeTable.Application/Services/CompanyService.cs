@@ -48,25 +48,23 @@ namespace TimeTable.Application.Services
 
         public virtual async Task UpdateAsync(Company businessModel, bool withTransaction)
         {
-            CompanyEntity entity = await repository.GetAsync();
-            await ValidateEntityToUpdateAsync(entity, businessModel);
-            await MapUpdatingAsync(entity, businessModel);
+            await ValidateEntityToUpdateAsync(businessModel);
+            CompanyEntity entity = await MapUpdatingAsync(businessModel);
             await repository.UpdateAsync(entity);
             await unitOfWork.SaveChangesAsync();
         }
 
-        protected virtual Task ValidateEntityToUpdateAsync(CompanyEntity entity, Company businessModel)
+        protected virtual async Task ValidateEntityToUpdateAsync(Company businessModel)
         {
-            if (entity?.Id != businessModel.Id)
+            CompanyEntity currentCompany = await repository.GetAsync();
+            if (currentCompany.Id != businessModel.Id)
                 throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
-
-            return Task.CompletedTask;
         }
 
-        protected virtual Task MapUpdatingAsync(CompanyEntity entity, Company businessModel)
+        protected virtual Task<CompanyEntity> MapUpdatingAsync(Company businessModel)
         {
-            mapper.MapUpdating(entity, businessModel);
-            return Task.CompletedTask;
+            CompanyEntity entity = mapper.MapUpdating(businessModel);
+            return Task.FromResult(entity);
         }
     }
 }

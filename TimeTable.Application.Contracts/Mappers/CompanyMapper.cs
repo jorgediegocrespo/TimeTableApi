@@ -14,9 +14,13 @@ namespace TimeTable.Application.Contracts.Mappers
             };
         }
 
-        public void MapUpdating(CompanyEntity entity, Company businessModel)
+        public CompanyEntity MapUpdating(Company businessModel)
         {
-            entity.Name = businessModel.Name;
+            return new CompanyEntity()
+            {
+                Id = businessModel.Id,
+                Name = businessModel.Name
+            };
         }
     }
 }
