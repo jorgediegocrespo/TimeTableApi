@@ -12,6 +12,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
+                IsDefault = entity.IsDefault,
             };
         }
 
@@ -21,6 +22,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
+                IsDefault = entity.IsDefault,
             };
         }
 
@@ -28,7 +30,8 @@ namespace TimeTable.Application.Contracts.Mappers
         {
             return new PersonEntity()
             {
-                Name = businessModel.Name
+                Name = businessModel.Name,
+                IsDefault = false
             };
         }        
 
@@ -38,6 +41,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = businessModel.Id,
                 Name = businessModel.Name,
+                IsDefault = false
             };
         }
     }

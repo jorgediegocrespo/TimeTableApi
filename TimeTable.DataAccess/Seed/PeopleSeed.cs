@@ -42,7 +42,7 @@ namespace TimeTable.DataAccess.Seed
 					await userManager.AddToRoleAsync(user, RolesConsts.ADMIN);
 
 					string userId = await userManager.GetUserIdAsync(user);
-					await context.People.AddAsync(new PersonEntity() { Name = "Admin", UserId = userId });
+					await context.People.AddAsync(new PersonEntity() { Name = "Admin", UserId = userId, IsDefault = true });
 
 					await context.SaveChangesAsync();
 
