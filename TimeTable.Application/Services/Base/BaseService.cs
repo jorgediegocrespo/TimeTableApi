@@ -21,7 +21,7 @@ namespace TimeTable.Application.Services.Base
             int maxTrys = appConfig.MaxTrys;
             TimeSpan timeToWait = TimeSpan.FromSeconds(appConfig.SecondToWait);
             return Policy
-                .Handle<Exception>(ex => !(ex is NotValidItemException) && !(ex is ForbidenActionException))
+                .Handle<Exception>(ex => !(ex is NotValidOperationException) && !(ex is ForbidenActionException))
                 .WaitAndRetryAsync(maxTrys, i => timeToWait);
         }
     }

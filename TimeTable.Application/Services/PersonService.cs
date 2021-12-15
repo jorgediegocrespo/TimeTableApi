@@ -60,7 +60,7 @@ namespace TimeTable.Application.Services
             await base.ValidateEntityToAddAsync(businessModel);
             bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
             if (existsPersonName)
-                throw new NotValidItemException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
+                throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
         }
 
         protected override async Task ValidateEntityToUpdateAsync(UpdatingBusinessPerson businessModel)
@@ -68,7 +68,7 @@ namespace TimeTable.Application.Services
             await base.ValidateEntityToUpdateAsync(businessModel);
             bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
             if (existsPersonName)
-                throw new NotValidItemException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
+                throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
 
             int? contextPersonId = await userService.GetContextPersonIdAsync();
             if (!contextPersonId.HasValue || contextPersonId.Value != businessModel.Id)
@@ -78,9 +78,9 @@ namespace TimeTable.Application.Services
         protected override async Task ValidateEntityToDeleteAsync(int id)
         {
             await base.ValidateEntityToDeleteAsync(id);
-            int? contextPersonId = await userService.GetContextPersonIdAsync();
-            if (!contextPersonId.HasValue || contextPersonId.Value != id)
-                throw new ForbidenActionException();
+            PersonEntity person = await repository.GetAsync(id);
+            if (person.IsDefault)
+                throw new NotValidOperationException(ErrorCodes.PERSON_DEFAULT, $"A default person could not be removed");
         }
 
         private async Task<int> AddOperationsAsync(CreationPerson businessModel)
@@ -104,8 +104,9 @@ namespace TimeTable.Application.Services
         private async Task DeleteOperationsAsync(int id)
         {
             PersonEntity user = await repository.GetAsync(id);
-            await base.DeleteAsync(id);            
+            await base.DeleteAsync(id, false);            
             await userService.DeleteAsync(user.UserId);
+            await UserManager.UpdateSecurityStampAsync(user.Id);
         }
     }
 }

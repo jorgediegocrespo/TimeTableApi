@@ -121,14 +121,14 @@ namespace TimeTable.Application.Services.Base
         {
             bool existsItem = await repository.ExistsAsync(x => x.Id == businessModel.Id);
             if (!existsItem)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {businessModel.Id}");
         }
 
         protected virtual async Task ValidateEntityToDeleteAsync(int id)
         {
             bool existsItem = await repository.ExistsAsync(x => x.Id == id);
             if (!existsItem)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {id}");
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any item with the id {id}");
         }
 
         protected virtual Task<E> MapCreatingAsync(C businessModel)

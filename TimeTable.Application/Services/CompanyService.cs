@@ -58,7 +58,7 @@ namespace TimeTable.Application.Services
         {
             CompanyEntity currentCompany = await repository.GetAsync();
             if (currentCompany.Id != businessModel.Id)
-                throw new NotValidItemException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
         }
 
         protected virtual Task<CompanyEntity> MapUpdatingAsync(Company businessModel)

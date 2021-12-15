@@ -48,7 +48,7 @@ namespace TimeTable.Application.Services
 
             var result = await userManager.CreateAsync(user, userInfo.Password);
             if (!result.Succeeded)
-                throw new NotValidItemException(ErrorCodes.USER_REGISTER_ERROR, $"Error registering user");
+                throw new NotValidOperationException(ErrorCodes.USER_REGISTER_ERROR, $"Error registering user");
 
             return await userManager.GetUserIdAsync(user);
         }

@@ -43,7 +43,7 @@ namespace TimeTable.Application.Services
                 x.EndDateTime != null &&
                 x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime);
             if (existsOverlappingTimeRecord)
-                throw new NotValidItemException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
+                throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
         }
 
         private async Task ValidateOverlappingTimeRecord(DateTimeOffset dateTime, int id)
@@ -57,7 +57,7 @@ namespace TimeTable.Application.Services
                 x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime &&
                 x.Id != id);
             if (existsOverlappingTimeRecord)
-                throw new NotValidItemException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
+                throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
         }
     }
 }
