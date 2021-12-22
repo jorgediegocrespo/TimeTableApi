@@ -36,7 +36,6 @@ namespace TimeTable.DataAccess.Repositories.Base
 
         public virtual Task UpdateAsync(T entity)
         {
-            DbEntity.Attach(entity);
             DbEntity.Update(entity);
             return Task.CompletedTask;
         }

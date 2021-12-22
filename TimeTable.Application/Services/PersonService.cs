@@ -1,6 +1,4 @@
-﻿using Polly.Retry;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Mappers;
@@ -63,9 +61,9 @@ namespace TimeTable.Application.Services
                 throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
         }
 
-        protected override async Task ValidateEntityToUpdateAsync(UpdatingBusinessPerson businessModel)
+        protected override async Task ValidateEntityToUpdateAsync(PersonEntity entity, UpdatingBusinessPerson businessModel)
         {
-            await base.ValidateEntityToUpdateAsync(businessModel);
+            await base.ValidateEntityToUpdateAsync(entity, businessModel);
             bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
             if (existsPersonName)
                 throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
@@ -103,10 +101,9 @@ namespace TimeTable.Application.Services
 
         private async Task DeleteOperationsAsync(int id)
         {
-            PersonEntity user = await repository.GetAsync(id);
+            PersonEntity person = await repository.GetAsync(id);
             await base.DeleteAsync(id, false);            
-            await userService.DeleteAsync(user.UserId);
-            await UserManager.UpdateSecurityStampAsync(user.Id);
+            await userService.DeleteAsync(person.UserId);
         }
     }
 }

@@ -58,20 +58,7 @@ namespace TimeTable.Api.Controllers
         [Authorize(Roles = RolesConsts.ADMIN)]
         public override async Task<IActionResult> Post([FromBody] CreationPerson person)
         {
-            if (person == null)
-                return BadRequest();
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            int createdId = await personService.AddAsync(person);
-            string token = await userService.LoginAsync(new LoginUserInfo
-            {
-                UserName = person.Name,
-                Password = person.Password
-            });
-
-            return Created(nameof(GetById), new { id = createdId, token = token });
+            return await base.Post(person);
         }
 
         [HttpPut]

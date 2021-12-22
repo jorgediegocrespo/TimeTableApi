@@ -12,5 +12,6 @@ namespace TimeTable.Application.Contracts.Services
         string GetContextUserName();
         string GetContextUserEmail();
         Task DeleteAsync(string userId);
+        Task UpdateSecurityStampAsync(string userId);
     }
 }

@@ -26,9 +26,10 @@ namespace TimeTable.Application.Services
             await ValidateOverlappingTimeRecord(businessModel.EndDateTime);
         }
 
-        protected override async Task ValidateEntityToUpdateAsync(UpdatingTimeRecord businessModel)
+
+        protected override async Task ValidateEntityToUpdateAsync(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
         {
-            await base.ValidateEntityToUpdateAsync(businessModel);
+            await base.ValidateEntityToUpdateAsync(entity, businessModel);
             await ValidateOverlappingTimeRecord(businessModel.StartDateTime, businessModel.Id);
             await ValidateOverlappingTimeRecord(businessModel.EndDateTime, businessModel.Id);
         }

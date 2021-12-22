@@ -38,15 +38,11 @@ namespace TimeTable.Application.Contracts.Mappers
         }
 
 
-        public TimeRecordEntity MapUpdating(UpdatingTimeRecord businessModel)
+        public void MapUpdating(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
         {
-            return new TimeRecordEntity()
-            {
-                Id = businessModel.Id,
-                PersonId = businessModel.PersonId,
-                StartDateTime = businessModel.StartDateTime,
-                EndDateTime = businessModel.EndDateTime,
-            };
+            entity.PersonId = businessModel.PersonId;
+            entity.StartDateTime = businessModel.StartDateTime;
+            entity.EndDateTime = businessModel.EndDateTime;
         }
     }
 }

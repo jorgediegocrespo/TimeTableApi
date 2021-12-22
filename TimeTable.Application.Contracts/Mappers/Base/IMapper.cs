@@ -13,6 +13,6 @@ namespace TimeTable.Application.Contracts.Mappers.Base
         BR MapBasicReading(E entity);
         DR MapDetailedReading(E entity);
         E MapCreating(C businessModel);
-        E MapUpdating(U businessModel);
+        void MapUpdating(E entity, U businessModel);
     }
 }

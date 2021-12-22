@@ -93,6 +93,12 @@ namespace TimeTable.Application.Services
             await userManager.DeleteAsync(user);
         }
 
+        public async Task UpdateSecurityStampAsync(string userId)
+        {
+            IdentityUser user = await userManager.FindByIdAsync(userId);
+            await userManager.UpdateSecurityStampAsync(user);
+        }
+
         private async Task<string> GetToken(LoginUserInfo userInfo)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtKey"]));
