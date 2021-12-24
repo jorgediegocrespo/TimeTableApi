@@ -15,9 +15,8 @@ namespace TimeTable.DataAccess.Repositories
 
         public Task<CompanyEntity> GetAsync() => DbEntity.FirstOrDefaultAsync();
 
-        public virtual Task UpdateAsync(CompanyEntity entity)
+        public Task UpdateAsync(CompanyEntity entity)
         {
-            DbEntity.Attach(entity);
             DbEntity.Update(entity);
             return Task.CompletedTask;
         }

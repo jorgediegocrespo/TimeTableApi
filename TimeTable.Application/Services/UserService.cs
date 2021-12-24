@@ -70,7 +70,7 @@ namespace TimeTable.Application.Services
             if (userId == null)
                 return null;
 
-            PersonEntity person = await personRepository.GetByUserIdAsync(userId);
+            PersonEntity person = await personRepository.GetAsync(userId);
             if (person == null)
                 return null;
 

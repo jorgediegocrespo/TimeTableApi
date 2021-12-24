@@ -14,15 +14,13 @@ namespace TimeTable.Application.Services
 {
     public class CompanyService : BaseService, ICompanyService
     {
-        private readonly IUnitOfWork unitOfWork;
         private readonly ICompanyRepository repository;
 
         public CompanyService(IUnitOfWork unitOfWork, 
                               ICompanyRepository repository, 
                               IAppConfig appConfig)
-            : base(appConfig)
+            : base(unitOfWork, appConfig)
         {
-            this.unitOfWork = unitOfWork;
             this.repository = repository;
         }
 

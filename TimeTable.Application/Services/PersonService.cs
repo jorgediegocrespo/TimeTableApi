@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Polly.Retry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Mappers;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
@@ -12,31 +15,92 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class PersonService : BaseCrudService<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson, PersonEntity>, IPersonService
+    public class PersonService : BaseService, IPersonService
     {
+        private readonly IPersonRepository repository;
         private readonly IUserService userService;
         
         public PersonService(IUnitOfWork unitOfWork, 
                              IPersonRepository repository, 
                              IAppConfig appConfig, 
                              IUserService userService)
-            : base(unitOfWork, repository, appConfig, new PersonMapper())
+            : base(unitOfWork, appConfig)
         {
+            this.repository = repository;
             this.userService = userService;
         }
 
-        public virtual async Task<DetailedReadingPerson> GetOwnAsync()
+        public async Task<IEnumerable<ReadingPerson>> GetAllAsync()
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(
+                async () =>
+                {
+                    IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync();
+                    return allEntities.Select(x => MapReading(x));
+                });
+        }
+
+        public async Task<ReadingPerson> GetAsync(int id)
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(async () =>
+            {
+                PersonEntity entity = await repository.GetAsync(id);
+                return MapReading(entity);
+            });
+        }
+
+        public async Task<ReadingPerson> GetOwnAsync()
         {
             int? id = await userService.GetContextPersonIdAsync();
             return await GetAsync(id.Value);
         }
 
-        public override async Task<int> AddAsync(CreationPerson businessModel, bool withTransaction = true)
+        public async Task<int> AddAsync(CreatingPerson businessModel)
         {
-            if (withTransaction)
-                return await unitOfWork.SaveChangesInTransactionAsync(async () => await AddOperationsAsync(businessModel));
-            else
-                return await AddOperationsAsync(businessModel);
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(async () => 
+                         await unitOfWork.SaveChangesInTransactionAsync(async () =>
+            {
+                await ValidateEntityToAddAsync(businessModel);
+                string userId = await userService.RegisterAsync(new RegisterUserInfo
+                {
+                    Email = businessModel.Email,
+                    UserName = businessModel.Name,
+                    Password = businessModel.Password,
+                });
+
+                var entity = MapCreating(businessModel);
+                entity.UserId = userId;
+                await repository.AddAsync(entity);
+                await unitOfWork.SaveChangesAsync();
+
+                return entity.Id;
+            }));
+        }
+
+        public async Task UpdateAsync(UpdatingPerson businessModel)
+        {
+            PersonEntity entity = await repository.GetAsync(businessModel.Id);
+            await ValidateEntityToUpdateAsync(entity, businessModel);
+            MapUpdating(entity, businessModel);
+            await repository.UpdateAsync(entity);
+            await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            await retryPolity.ExecuteAsync(async () =>
+                  await unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                PersonEntity person = await repository.GetAsync(id);
+                ValidateEntityToDelete(person, id);
+                await repository.DeleteAsync(id);
+                await unitOfWork.SaveChangesAsync();
+                await userService.DeleteAsync(person.UserId);
+            }));
         }
 
         public async Task DeleteOwnAsync()
@@ -45,26 +109,41 @@ namespace TimeTable.Application.Services
             await DeleteAsync(id.Value);
         }
 
-        public override async Task DeleteAsync(int id, bool withTransaction)
+        private ReadingPerson MapReading(PersonEntity entity)
         {
-            if (withTransaction)
-                await unitOfWork.ExecuteInTransactionAsync(async () => await DeleteOperationsAsync(id));
-            else
-                await DeleteOperationsAsync(id);
+            return new ReadingPerson()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                IsDefault = entity.IsDefault,
+            };
         }
 
-        protected override async Task ValidateEntityToAddAsync(CreationPerson businessModel)
+        private PersonEntity MapCreating(CreatingPerson businessModel)
         {
-            await base.ValidateEntityToAddAsync(businessModel);
-            bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
+            return new PersonEntity()
+            {
+                Name = businessModel.Name,
+                IsDefault = false
+            };
+        }
+
+        private void MapUpdating(PersonEntity entity, UpdatingPerson businessModel)
+        {
+            entity.Name = businessModel.Name;
+            entity.IsDefault = false;
+        }
+
+        private async Task ValidateEntityToAddAsync(CreatingPerson businessModel)
+        {
+            bool existsPersonName = await repository.ExistsAsync(0, businessModel.Name);
             if (existsPersonName)
                 throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
         }
 
-        protected override async Task ValidateEntityToUpdateAsync(PersonEntity entity, UpdatingBusinessPerson businessModel)
+        private async Task ValidateEntityToUpdateAsync(PersonEntity entity, UpdatingPerson businessModel)
         {
-            await base.ValidateEntityToUpdateAsync(entity, businessModel);
-            bool existsPersonName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
+            bool existsPersonName = await repository.ExistsAsync(businessModel.Id, businessModel.Name);
             if (existsPersonName)
                 throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
 
@@ -73,37 +152,10 @@ namespace TimeTable.Application.Services
                 throw new ForbidenActionException();
         }
 
-        protected override async Task ValidateEntityToDeleteAsync(int id)
+        private void ValidateEntityToDelete(PersonEntity person, int id)
         {
-            await base.ValidateEntityToDeleteAsync(id);
-            PersonEntity person = await repository.GetAsync(id);
             if (person.IsDefault)
                 throw new NotValidOperationException(ErrorCodes.PERSON_DEFAULT, $"A default person could not be removed");
-        }
-
-        private async Task<int> AddOperationsAsync(CreationPerson businessModel)
-        {
-            await ValidateEntityToAddAsync(businessModel);
-            string userId = await userService.RegisterAsync(new RegisterUserInfo
-            {
-                Email = businessModel.Email,
-                UserName = businessModel.Name,
-                Password = businessModel.Password,
-            });
-            
-
-            var entity = await MapCreatingAsync(businessModel);
-            entity.UserId = userId;
-            await repository.AddAsync(entity);
-            await unitOfWork.SaveChangesAsync();
-            return entity.Id;
-        }
-
-        private async Task DeleteOperationsAsync(int id)
-        {
-            PersonEntity person = await repository.GetAsync(id);
-            await base.DeleteAsync(id, false);            
-            await userService.DeleteAsync(person.UserId);
         }
     }
 }

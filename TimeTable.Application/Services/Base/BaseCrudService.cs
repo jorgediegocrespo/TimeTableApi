@@ -21,7 +21,6 @@ namespace TimeTable.Application.Services.Base
         where U : IUpdatingBusinessModel
         where E : IBaseWithIdEntity
     {
-        protected readonly IUnitOfWork unitOfWork;
         protected readonly ICrudRepository<E> repository;
         protected readonly IMapper<BR, DR, C, U, E> mapper;
 
@@ -29,9 +28,8 @@ namespace TimeTable.Application.Services.Base
                                ICrudRepository<E> repository, 
                                IAppConfig appConfig, 
                                IMapper<BR, DR, C, U, E> mapper) 
-            : base(appConfig)
+            : base(unitOfWork, appConfig)
         {
-            this.unitOfWork = unitOfWork;
             this.repository = repository;
             this.mapper = mapper;
         }

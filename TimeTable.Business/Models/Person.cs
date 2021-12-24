@@ -3,17 +3,14 @@ using TimeTable.Business.Models.Base;
 
 namespace TimeTable.Business.Models
 {
-    public class BasicReadingPerson : IBasicReadingBusinessModel
+    public class ReadingPerson
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsDefault { get; set; }
     }
 
-    public class DetailedReadingPerson : BasicReadingPerson, IDetailedReadingBusinessModel
-    { }
-
-    public class CreationPerson : ICreationBusinessModel
+    public class CreatingPerson
     {
         [Required]
         [MaxLength(450)]
@@ -28,7 +25,7 @@ namespace TimeTable.Business.Models
         public string Password { get; set; }
     }
 
-    public class UpdatingBusinessPerson : IUpdatingBusinessModel
+    public class UpdatingPerson
     {
         public int Id { get; set; }
 
