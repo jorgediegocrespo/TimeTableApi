@@ -8,6 +8,5 @@ namespace TimeTable.Application.Contracts.Services
     {
         Task<Company> GetAsync();
         Task UpdateAsync(Company businessModel);
-        Task UpdateAsync(Company businessModel, bool withTransaction);
     }
 }

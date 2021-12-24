@@ -7,6 +7,7 @@ using TimeTable.DataAccess.Contracts.Entities.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories.Base
 {
+    //TODO Remove
     public interface ICrudRepository<T> : IBaseRepository<T> 
         where T : IBaseWithIdEntity
     {
