@@ -8,5 +8,6 @@ namespace TimeTable.DataAccess.Contracts
     {
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         public Task<int> SaveChangesInTransactionAsync(Func<Task<int>> operation);
+        Task ExecuteInTransactionAsync(Func<Task> operation);
     }
 }

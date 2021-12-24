@@ -1,55 +1,59 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 
 namespace TimeTable.Api.Controllers
 {
     [Route("api/company")]
     [ApiController]
-    public class CompanyController : BaseCrudController<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class CompanyController : BaseController
     {
-        public CompanyController(ICompanyService service, IAppConfig config) : base(service, config)
-        { }
+        private readonly ICompanyService service;
+        private readonly UserManager<IdentityUser> aux;
 
-        [HttpGet]
-        [Route("items")]
-        [ProducesResponseType(typeof(IEnumerable<BasicReadingCompany>), StatusCodes.Status200OK)]
-        public override async Task<IActionResult> Get()
+        public CompanyController(ICompanyService service, IAppConfig config, UserManager<IdentityUser> aux) : base(config)
         {
-            return await base.Get();
+            this.service = service;
+            this.aux = aux;
         }
 
         [HttpGet]
-        [Route("items/{id}")]
-        [ProducesResponseType(typeof(DetailedReadingCompany), StatusCodes.Status200OK)]
-        public override async Task<IActionResult> GetById(int id)
+        [Route("item")]
+        [ProducesResponseType(typeof(Company), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Get()
         {
-            return await base.GetById(id);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public override async Task<IActionResult> Post([FromBody] CreationCompany company)
-        {
-            return await base.Post(company);
+            var aux1 = HttpContext.User.IsInRole(RolesConsts.ADMIN);
+            var aux2 = HttpContext.User.IsInRole("Admin");
+            Company entity = await service.GetAsync();
+            if (entity == null)
+                return NotFound();
+            else
+                return Ok(entity);
         }
 
         [HttpPut]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public override async Task<IActionResult> Put([FromBody] UpdatingCompany company)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = RolesConsts.ADMIN)]
+        public virtual async Task<IActionResult> Put(Company item)
         {
-            return await base.Put(company);
-        }
+            if (item == null)
+                return BadRequest();
 
-        [HttpDelete("{id}")]
-        public override async Task<IActionResult> Delete(int id)
-        {
-            return await base.Delete(id);
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            await service.UpdateAsync(item);
+            return NoContent();
         }
     }
 }

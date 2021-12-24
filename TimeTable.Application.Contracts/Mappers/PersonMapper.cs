@@ -12,8 +12,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin,
-                CompanyId = entity.CompanyId
+                IsDefault = entity.IsDefault,
             };
         }
 
@@ -23,8 +22,7 @@ namespace TimeTable.Application.Contracts.Mappers
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                IsAdmin = entity.IsAdmin,
-                CompanyId = entity.CompanyId
+                IsDefault = entity.IsDefault,
             };
         }
 
@@ -33,19 +31,14 @@ namespace TimeTable.Application.Contracts.Mappers
             return new PersonEntity()
             {
                 Name = businessModel.Name,
-                IsAdmin = businessModel.IsAdmin,
-                CompanyId = businessModel.CompanyId
+                IsDefault = false
             };
         }        
 
-        public PersonEntity MapUpdating(UpdatingBusinessPerson businessModel)
+        public void MapUpdating(PersonEntity entity, UpdatingBusinessPerson businessModel)
         {
-            return new PersonEntity()
-            {
-                Id = businessModel.Id,
-                Name = businessModel.Name,
-                IsAdmin = businessModel.IsAdmin
-            };
+            entity.Name = businessModel.Name;
+            entity.IsDefault = false;
         }
     }
 }

@@ -3,6 +3,6 @@ using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories
 {
-    public interface ITimeRecordRepository : IRepository<TimeRecordEntity>
+    public interface ITimeRecordRepository : ICrudRepository<TimeRecordEntity>
     { }
 }

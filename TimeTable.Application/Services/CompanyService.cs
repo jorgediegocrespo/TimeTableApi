@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Polly.Retry;
+using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Mappers;
@@ -12,55 +13,60 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class CompanyService : BaseCrudService<BasicReadingCompany, DetailedReadingCompany, CreationCompany, UpdatingCompany, CompanyEntity>, ICompanyService
+    public class CompanyService : BaseService, ICompanyService
     {
-        private readonly IPersonService personService;
-        private readonly IPersonRepository personRepository;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly ICompanyRepository repository;
+        private readonly CompanyMapper mapper;
 
-        public CompanyService(IUnitOfWork unitOfWork, ICompanyRepository repository, IAppConfig appConfig, IPersonService personService, IPersonRepository personRepository)
-            : base(unitOfWork, repository, appConfig, new CompanyMapper())
+        public CompanyService(IUnitOfWork unitOfWork, 
+                              ICompanyRepository repository, 
+                              IAppConfig appConfig)
+            : base(appConfig)
         {
-            this.personService = personService;
-            this.personRepository = personRepository;
+            this.unitOfWork = unitOfWork;
+            this.repository = repository;
+            mapper = new CompanyMapper();
         }
 
-        public override async Task<int> AddAsync(CreationCompany businessModel, bool withTransaction = true)
+        public async Task<Company> GetAsync()
         {
-            return await unitOfWork.SaveChangesInTransactionAsync(async () => await AddOperationsAsync(businessModel));
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(
+                async () =>
+                {
+                    CompanyEntity company = await repository.GetAsync();
+                    return mapper.MapReading(company);
+                });
         }
 
-        private async Task<int> AddOperationsAsync(CreationCompany businessModel)
+        public virtual async Task UpdateAsync(Company businessModel)
         {
-            int companyId = await base.AddAsync(businessModel, false);
-            businessModel.Creator.CompanyId = companyId;
-            businessModel.Creator.IsAdmin = true;
-            await personService.AddAsync(businessModel.Creator, false);
-
-            return companyId;
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            await retryPolity.ExecuteAsync(async () => await UpdateAsync(businessModel, true));
         }
 
-        protected override async Task ValidateEntityToAddAsync(CreationCompany businessModel)
+        public virtual async Task UpdateAsync(Company businessModel, bool withTransaction)
         {
-            await base.ValidateEntityToAddAsync(businessModel);
-            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower());
-            if (existsCompanyName)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
+            CompanyEntity entity = await repository.GetAsync();
+            await ValidateEntityToUpdateAsync(entity, businessModel);
+            await MapUpdatingAsync(entity, businessModel);
+            await repository.UpdateAsync(entity);
+            await unitOfWork.SaveChangesAsync();
         }
 
-        protected override async Task ValidateEntityToUpdateAsync(UpdatingCompany businessModel)
+        protected virtual Task ValidateEntityToUpdateAsync(CompanyEntity entity, Company businessModel)
         {
-            await base.ValidateEntityToUpdateAsync(businessModel);
-            bool existsCompanyName = await repository.ExistsAsync(x => x.Name.ToLower() == businessModel.Name.ToLower() && x.Id != businessModel.Id);
-            if (existsCompanyName)
-                throw new NotValidItemException(ErrorCodes.COMPANY_NAME_EXISTS, $"The name {businessModel.Name} already exists in other company");
+            if (entity.Id != businessModel.Id)
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
+
+            return Task.CompletedTask;
         }
 
-        protected override async Task ValidateEntityToDeleteAsync(int id)
+        protected virtual Task MapUpdatingAsync(CompanyEntity entity, Company businessModel)
         {
-            await base.ValidateEntityToDeleteAsync(id);
-            bool hasPeople = await personRepository.ExistsAsync(x => x.CompanyId == id);
-            if (hasPeople)
-                throw new NotValidItemException(ErrorCodes.COMPANY_HAS_PEOPLE, $"The company has associated people");
+            mapper.MapUpdating(entity, businessModel);
+            return Task.FromResult(entity);
         }
     }
 }

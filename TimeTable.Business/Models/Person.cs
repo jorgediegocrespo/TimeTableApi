@@ -7,14 +7,11 @@ namespace TimeTable.Business.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool IsAdmin { get; set; }
-        public int CompanyId { get; set; }
+        public bool IsDefault { get; set; }
     }
 
     public class DetailedReadingPerson : BasicReadingPerson, IDetailedReadingBusinessModel
-    {
-        public BasicReadingCompany Company { get; set; }
-    }
+    { }
 
     public class CreationPerson : ICreationBusinessModel
     {
@@ -24,10 +21,11 @@ namespace TimeTable.Business.Models
         public string Name { get; set; }
 
         [Required]
-        public bool IsAdmin { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
         [Required]
-        public int CompanyId { get; set; }
+        public string Password { get; set; }
     }
 
     public class UpdatingBusinessPerson : IUpdatingBusinessModel
@@ -38,8 +36,5 @@ namespace TimeTable.Business.Models
         [MaxLength(450)]
         [MinLength(4)]
         public string Name { get; set; }
-
-        [Required]
-        public bool IsAdmin { get; set; }
     }
 }

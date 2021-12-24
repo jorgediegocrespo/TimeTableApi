@@ -36,9 +36,12 @@ namespace TimeTable.CrossCutting.Middleware
 
             switch (exception)
             {
-                case NotValidItemException notValidItemException:
+                case NotValidOperationException notValidItemException:
                     statusCode = HttpStatusCode.Conflict;
                     errorDescription = notValidItemException.Description;
+                    break;
+                case ForbidenActionException forbidenActionException:
+                    statusCode = HttpStatusCode.Forbidden;
                     break;
             }
 

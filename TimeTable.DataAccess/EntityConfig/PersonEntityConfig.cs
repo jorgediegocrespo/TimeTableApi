@@ -14,15 +14,6 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             entityBuilder.Property(x => x.Name).IsRequired(true);
-            entityBuilder.Property(x => x.IsAdmin).IsRequired(true);
-
-            entityBuilder.HasIndex(a => a.Name).IsUnique(true);
-
-            entityBuilder.HasOne(x => x.Company)
-                .WithMany(x => x.People)
-                .IsRequired(true)
-                .HasForeignKey(x => x.CompanyId)
-                .IsRequired(true);
 
             entityBuilder.HasMany(x => x.TimeRecords).WithOne(x => x.Person);
         }

@@ -7,7 +7,5 @@ namespace TimeTable.DataAccess.Contracts.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
-        public List<PersonEntity> People { get; set; }
     }
 }
