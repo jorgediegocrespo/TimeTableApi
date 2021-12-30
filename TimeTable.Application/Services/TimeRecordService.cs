@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Polly.Retry;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Mappers;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
@@ -13,52 +14,170 @@ using TimeTable.DataAccess.Contracts.Repositories;
 
 namespace TimeTable.Application.Services
 {
-    public class TimeRecordService : BaseCrudService<BasicReadingTimeRecord, DetailedReadingTimeRecord, CreationTimeRecord, UpdatingTimeRecord, TimeRecordEntity>, ITimeRecordService
+    public class TimeRecordService : BaseService, ITimeRecordService
     {
-        public TimeRecordService(IUnitOfWork unitOfWork, ITimeRecordRepository repository, IAppConfig appConfig)
-            : base(unitOfWork, repository, appConfig, new TimeRecordMapper())
-        { }
+        private readonly ITimeRecordRepository repository;
+        private readonly IUserService userService;
 
-        protected override async Task ValidateEntityToAddAsync(CreationTimeRecord businessModel)
+        public TimeRecordService(IUnitOfWork unitOfWork, 
+                                 ITimeRecordRepository repository, 
+                                 IAppConfig appConfig,
+                                 IUserService userService)
+            : base(unitOfWork, appConfig)
         {
-            await base.ValidateEntityToAddAsync(businessModel);
-            await ValidateOverlappingTimeRecord(businessModel.StartDateTime);
-            await ValidateOverlappingTimeRecord(businessModel.EndDateTime);
+            this.repository = repository;
+            this.userService = userService;
         }
 
-
-        protected override async Task ValidateEntityToUpdateAsync(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
+        public async Task<IEnumerable<ReadingTimeRecord>> GetAllAsync()
         {
-            await base.ValidateEntityToUpdateAsync(entity, businessModel);
-            await ValidateOverlappingTimeRecord(businessModel.StartDateTime, businessModel.Id);
-            await ValidateOverlappingTimeRecord(businessModel.EndDateTime, businessModel.Id);
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(
+                async () =>
+                {
+                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync();
+                    return allEntities.Select(x => MapReading(x));
+                });
         }
 
-        private async Task ValidateOverlappingTimeRecord(DateTimeOffset dateTime)
+        public async Task<IEnumerable<ReadingTimeRecord>> GetAllOwnAsync()
         {
-            if (dateTime == null)
+            int? personId = await userService.GetContextPersonIdAsync();
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(
+                async () =>
+                {
+                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(personId.Value);
+                    return allEntities.Select(x => MapReading(x));
+                });
+        }
+
+        public async Task<ReadingTimeRecord> GetAsync(int id)
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(async () =>
+            {
+                TimeRecordEntity entity = await repository.GetAsync(id);
+                return MapReading(entity);
+            });
+        }
+
+        public async Task<ReadingTimeRecord> GetOwnAsync(int id)
+        {
+            int? personId = await userService.GetContextPersonIdAsync();
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(async () =>
+            {
+                TimeRecordEntity entity = await repository.GetAsync(id, personId.Value);
+                return MapReading(entity);
+            });
+        }
+
+        public async Task<int> AddAsync(CreatingTimeRecord businessModel)
+        {
+            int? personId = await userService.GetContextPersonIdAsync();
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            return await retryPolity.ExecuteAsync(async () =>
+            {
+                await ValidateEntityToAddAsync(businessModel);
+                TimeRecordEntity entity = MapCreating(businessModel, personId.Value);
+                await repository.AddAsync(entity);
+                await unitOfWork.SaveChangesAsync();
+
+                return entity.Id;
+            });
+        }
+
+        public async Task UpdateAsync(UpdatingTimeRecord businessModel)
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            await retryPolity.ExecuteAsync(async () =>
+            {
+                TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
+                await ValidateEntityToUpdateAsync(entity, businessModel);
+                MapUpdating(entity, businessModel);
+                await repository.AddAsync(entity);
+                await unitOfWork.SaveChangesAsync();
+            });
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            await retryPolity.ExecuteAsync(async () =>
+            {
+                TimeRecordEntity entity = await repository.GetAsync(id);
+                await ValidateEntityToDeleteAsync(entity);
+                await repository.DeleteAsync(id);
+                await unitOfWork.SaveChangesAsync();
+            });
+        }
+
+        private ReadingTimeRecord MapReading(TimeRecordEntity entity)
+        {
+            return new ReadingTimeRecord()
+            {
+                Id = entity.Id,
+                PersonId = entity.PersonId,
+                StartDateTime = entity.StartDateTime,
+                EndDateTime = entity.EndDateTime,
+            };
+        }
+
+        private TimeRecordEntity MapCreating(CreatingTimeRecord businessModel, int personId)
+        {
+            return new TimeRecordEntity()
+            {
+                PersonId = personId,
+                StartDateTime = businessModel.StartDateTime,
+                EndDateTime = businessModel.EndDateTime,
+            };
+        }
+
+        private void MapUpdating(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
+        {
+            entity.StartDateTime = businessModel.StartDateTime;
+            entity.EndDateTime = businessModel.EndDateTime;
+        }
+
+        private async Task ValidateEntityToAddAsync(CreatingTimeRecord businessModel)
+        {
+            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.StartDateTime);
+            if (existsOverlappingTimeRecord)
+                throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
+
+            if (businessModel.EndDateTime == null)
                 return;
 
-            bool existsOverlappingTimeRecord = await repository.ExistsAsync(x =>
-                x.StartDateTime.UtcDateTime <= dateTime.UtcDateTime &&
-                x.EndDateTime != null &&
-                x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime);
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.EndDateTime);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
         }
 
-        private async Task ValidateOverlappingTimeRecord(DateTimeOffset dateTime, int id)
+        private async Task ValidateEntityToUpdateAsync(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
         {
-            if (dateTime == null)
-                return;
+            int? personId = await userService.GetContextPersonIdAsync();
+            if (entity.PersonId != personId.Value)
+                throw new ForbidenActionException();
 
-            bool existsOverlappingTimeRecord = await repository.ExistsAsync(x =>
-                x.StartDateTime.UtcDateTime <= dateTime.UtcDateTime &&
-                x.EndDateTime != null &&
-                x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime &&
-                x.Id != id);
+            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.StartDateTime);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
+
+            if (businessModel.EndDateTime == null)
+                return;
+
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.EndDateTime);
+            if (existsOverlappingTimeRecord)
+                throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
+
+        }
+
+        private async Task ValidateEntityToDeleteAsync(TimeRecordEntity entity)
+        {
+            int? personId = await userService.GetContextPersonIdAsync();
+            if (entity.PersonId != personId.Value)
+                throw new ForbidenActionException();
         }
     }
 }

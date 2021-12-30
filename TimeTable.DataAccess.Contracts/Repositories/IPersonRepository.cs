@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeTable.DataAccess.Contracts.Entities;
-using TimeTable.DataAccess.Contracts.Repositories.Base;
 
 namespace TimeTable.DataAccess.Contracts.Repositories
 {
-    public interface IPersonRepository : IBaseRepository<PersonEntity>
+    public interface IPersonRepository
     {
         Task<bool> ExistsAsync(int id, string name);
         Task<IEnumerable<PersonEntity>> GetAllAsync();

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
@@ -27,6 +26,9 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("item")]
         [ProducesResponseType(typeof(Company), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get()
         {
             Company entity = await service.GetAsync();
@@ -40,7 +42,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> Put([FromBody]Company item)
+        public async Task<IActionResult> Put([FromBody]Company item)
         {
             if (item == null)
                 return BadRequest();

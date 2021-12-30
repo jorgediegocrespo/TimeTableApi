@@ -19,10 +19,10 @@ namespace TimeTable.Application.Services
     {
         private readonly IPersonRepository repository;
         private readonly IUserService userService;
-        
-        public PersonService(IUnitOfWork unitOfWork, 
-                             IPersonRepository repository, 
-                             IAppConfig appConfig, 
+
+        public PersonService(IUnitOfWork unitOfWork,
+                             IPersonRepository repository,
+                             IAppConfig appConfig,
                              IUserService userService)
             : base(unitOfWork, appConfig)
         {
@@ -60,7 +60,7 @@ namespace TimeTable.Application.Services
         public async Task<int> AddAsync(CreatingPerson businessModel)
         {
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () => 
+            return await retryPolity.ExecuteAsync(async () =>
                          await unitOfWork.SaveChangesInTransactionAsync(async () =>
             {
                 await ValidateEntityToAddAsync(businessModel);
@@ -82,11 +82,15 @@ namespace TimeTable.Application.Services
 
         public async Task UpdateAsync(UpdatingPerson businessModel)
         {
-            PersonEntity entity = await repository.GetAsync(businessModel.Id);
-            await ValidateEntityToUpdateAsync(entity, businessModel);
-            MapUpdating(entity, businessModel);
-            await repository.UpdateAsync(entity);
-            await unitOfWork.SaveChangesAsync();
+            AsyncRetryPolicy retryPolity = GetRetryPolicy();
+            await retryPolity.ExecuteAsync(async () =>
+            {
+                PersonEntity entity = await repository.GetAsync(businessModel.Id);
+                await ValidateEntityToUpdateAsync(entity, businessModel);
+                MapUpdating(entity, businessModel);
+                await repository.UpdateAsync(entity);
+                await unitOfWork.SaveChangesAsync();
+            });
         }
 
         public async Task DeleteAsync(int id)

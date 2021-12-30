@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TimeTable.Business.Models.Base;
 
 namespace TimeTable.Business.Models
 {

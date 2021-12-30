@@ -18,21 +18,19 @@ namespace TimeTable.Api.Controllers
     public class PersonController : BaseController
     {
         private readonly IPersonService service;
-        private readonly IUserService userService;
         
-
-        public PersonController(IPersonService service, IUserService userService, IAppConfig config) : base(config)
+        public PersonController(IPersonService service, IAppConfig config) : base(config)
         {
             this.service = service;
-            this.userService = userService;
         }
 
         [HttpGet]
         [Route("items")]
         [ProducesResponseType(typeof(IEnumerable<ReadingPerson>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> Get()
+        public async Task<IActionResult> Get()
         {
             var entities = await service.GetAllAsync();
             return Ok(entities);
@@ -41,11 +39,11 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(ReadingPerson), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> GetById([FromQuery]int id)
+        public async Task<IActionResult> GetById([FromQuery]int id)
         {
             var entity = await service.GetAsync(id);
             if (entity == null)
@@ -55,9 +53,9 @@ namespace TimeTable.Api.Controllers
         }
 
         [HttpGet]
-        [Route("own")]
+        [Route("ownItem")]
         [ProducesResponseType(typeof(ReadingPerson), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetOwn()
@@ -68,10 +66,11 @@ namespace TimeTable.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> Post([FromBody]CreatingPerson item)
+        public async Task<IActionResult> Post([FromBody]CreatingPerson item)
         {
             if (item == null)
                 return BadRequest();
@@ -86,9 +85,10 @@ namespace TimeTable.Api.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public virtual async Task<IActionResult> Put([FromBody]UpdatingPerson item)
+        public async Task<IActionResult> Put([FromBody]UpdatingPerson item)
         {
             if (item == null)
                 return BadRequest();
@@ -104,9 +104,10 @@ namespace TimeTable.Api.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> Delete([FromQuery]int id)
+        public async Task<IActionResult> Delete([FromQuery]int id)
         {
             await service.DeleteAsync(id);
             return NoContent();
@@ -116,6 +117,7 @@ namespace TimeTable.Api.Controllers
         [Route("own")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteOwn()
         {
