@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
@@ -18,21 +17,20 @@ namespace TimeTable.Api.Controllers
     public class CompanyController : BaseController
     {
         private readonly ICompanyService service;
-        private readonly UserManager<IdentityUser> aux;
 
-        public CompanyController(ICompanyService service, IAppConfig config, UserManager<IdentityUser> aux) : base(config)
+        public CompanyController(ICompanyService service, IAppConfig config) : base(config)
         {
             this.service = service;
-            this.aux = aux;
         }
 
         [HttpGet]
         [Route("item")]
         [ProducesResponseType(typeof(Company), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get()
         {
-            var aux1 = HttpContext.User.IsInRole(RolesConsts.ADMIN);
-            var aux2 = HttpContext.User.IsInRole("Admin");
             Company entity = await service.GetAsync();
             if (entity == null)
                 return NotFound();
@@ -44,7 +42,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public virtual async Task<IActionResult> Put(Company item)
+        public async Task<IActionResult> Put([FromBody]Company item)
         {
             if (item == null)
                 return BadRequest();

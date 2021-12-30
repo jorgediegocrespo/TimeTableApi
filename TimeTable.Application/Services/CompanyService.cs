@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
-using TimeTable.Application.Contracts.Mappers;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
@@ -15,18 +14,14 @@ namespace TimeTable.Application.Services
 {
     public class CompanyService : BaseService, ICompanyService
     {
-        private readonly IUnitOfWork unitOfWork;
         private readonly ICompanyRepository repository;
-        private readonly CompanyMapper mapper;
 
         public CompanyService(IUnitOfWork unitOfWork, 
                               ICompanyRepository repository, 
                               IAppConfig appConfig)
-            : base(appConfig)
+            : base(unitOfWork, appConfig)
         {
-            this.unitOfWork = unitOfWork;
             this.repository = repository;
-            mapper = new CompanyMapper();
         }
 
         public async Task<Company> GetAsync()
@@ -36,37 +31,37 @@ namespace TimeTable.Application.Services
                 async () =>
                 {
                     CompanyEntity company = await repository.GetAsync();
-                    return mapper.MapReading(company);
+                    return new Company()
+                    {
+                        Id = company.Id,
+                        Name = company.Name,
+                    };
                 });
         }
 
-        public virtual async Task UpdateAsync(Company businessModel)
+        public async Task UpdateAsync(Company businessModel)
         {
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () => await UpdateAsync(businessModel, true));
+            await retryPolity.ExecuteAsync(async () =>
+            {
+                CompanyEntity entity = await repository.GetAsync();
+                ValidateEntityToUpdate(entity, businessModel);
+                MapUpdating(entity, businessModel);
+
+                await repository.UpdateAsync(entity);
+                await unitOfWork.SaveChangesAsync();
+            });
         }
 
-        public virtual async Task UpdateAsync(Company businessModel, bool withTransaction)
-        {
-            CompanyEntity entity = await repository.GetAsync();
-            await ValidateEntityToUpdateAsync(entity, businessModel);
-            await MapUpdatingAsync(entity, businessModel);
-            await repository.UpdateAsync(entity);
-            await unitOfWork.SaveChangesAsync();
-        }
-
-        protected virtual Task ValidateEntityToUpdateAsync(CompanyEntity entity, Company businessModel)
+        private void ValidateEntityToUpdate(CompanyEntity entity, Company businessModel)
         {
             if (entity.Id != businessModel.Id)
                 throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
-
-            return Task.CompletedTask;
         }
 
-        protected virtual Task MapUpdatingAsync(CompanyEntity entity, Company businessModel)
+        private void MapUpdating(CompanyEntity entity, Company businessModel)
         {
-            mapper.MapUpdating(entity, businessModel);
-            return Task.FromResult(entity);
+            entity.Name = businessModel.Name;
         }
     }
 }

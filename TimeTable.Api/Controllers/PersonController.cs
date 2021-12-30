@@ -15,72 +15,113 @@ namespace TimeTable.Api.Controllers
     [Route("api/person")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class PersonController : BaseCrudController<BasicReadingPerson, DetailedReadingPerson, CreationPerson, UpdatingBusinessPerson>
+    public class PersonController : BaseController
     {
-        private readonly IPersonService personService;
-        private readonly IUserService userService;
+        private readonly IPersonService service;
         
-
-        public PersonController(IPersonService service, IUserService userService, IAppConfig config) : base(service, config)
+        public PersonController(IPersonService service, IAppConfig config) : base(config)
         {
-            personService = service;
-            this.userService = userService;
+            this.service = service;
         }
 
         [HttpGet]
         [Route("items")]
-        [ProducesResponseType(typeof(IEnumerable<BasicReadingPerson>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ReadingPerson>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public override Task<IActionResult> Get()
+        public async Task<IActionResult> Get()
         {
-            return base.Get();
+            var entities = await service.GetAllAsync();
+            return Ok(entities);
         }
 
         [HttpGet]
         [Route("items/{id}")]
-        [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ReadingPerson), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public override async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById([FromQuery]int id)
         {
-            return await base.GetById(id);
+            var entity = await service.GetAsync(id);
+            if (entity == null)
+                return NotFound();
+            else
+                return Ok(entity);
         }
 
         [HttpGet]
-        [Route("own")]
-        [ProducesResponseType(typeof(DetailedReadingPerson), StatusCodes.Status200OK)]
+        [Route("ownItem")]
+        [ProducesResponseType(typeof(ReadingPerson), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetOwn()
         {
-            return Ok(await personService.GetOwnAsync());
+            return Ok(await service.GetOwnAsync());
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public override async Task<IActionResult> Post([FromBody] CreationPerson person)
+        public async Task<IActionResult> Post([FromBody]CreatingPerson item)
         {
-            return await base.Post(person);
+            if (item == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            int createdId = await service.AddAsync(item);
+            return Created(nameof(GetById), new { id = createdId });
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public override async Task<IActionResult> Put([FromBody] UpdatingBusinessPerson person)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Put([FromBody]UpdatingPerson item)
         {
-            return await base.Put(person);
+            if (item == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            await service.UpdateAsync(item);
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public override async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromQuery]int id)
         {
-            return await base.Delete(id);
+            await service.DeleteAsync(id);
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("own")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteOwn()
         {
-            await personService.DeleteOwnAsync();
+            await service.DeleteOwnAsync();
             return NoContent();
         }
     }

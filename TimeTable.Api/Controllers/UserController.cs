@@ -12,12 +12,10 @@ namespace TimeTable.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService service;
-        private readonly IAppConfig config;
 
         public UserController(IUserService service, IAppConfig config)
         {
             this.service = service;
-            this.config = config;
         }
 
         [HttpPost]
