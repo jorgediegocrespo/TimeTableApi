@@ -30,14 +30,20 @@ namespace TimeTable.Application.Services
             this.userService = userService;
         }
 
-        public async Task<IEnumerable<ReadingPerson>> GetAllAsync()
+        public async Task<PaginatedResponse<ReadingPerson>> GetAllAsync(PaginationRequest request)
         {
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync();
-                    return allEntities.Select(x => MapReading(x));
+                    PaginatedResponse<ReadingPerson> result = new PaginatedResponse<ReadingPerson>();
+                    IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
+                    int count = await repository.GetTotalRecordsAsync();
+                    return new PaginatedResponse<ReadingPerson>
+                    {
+                        TotalRegisters = count,
+                        Result = allEntities.Select(x => MapReading(x))
+                    };
                 });
         }
 

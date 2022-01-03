@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TimeTable.Application.Contracts.Services.Base;
 using TimeTable.Business.Models;
 
@@ -7,7 +6,7 @@ namespace TimeTable.Application.Contracts.Services
 {
     public interface IPersonService : IBaseService
     {
-        Task<IEnumerable<ReadingPerson>> GetAllAsync();
+        Task<PaginatedResponse<ReadingPerson>> GetAllAsync(PaginationRequest request);
         Task<ReadingPerson> GetAsync(int id);
         Task<ReadingPerson> GetOwnAsync();
         Task<int> AddAsync(CreatingPerson businessModel);

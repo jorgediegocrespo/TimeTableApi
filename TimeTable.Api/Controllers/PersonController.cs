@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
@@ -24,15 +23,22 @@ namespace TimeTable.Api.Controllers
             this.service = service;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("items")]
-        [ProducesResponseType(typeof(IEnumerable<ReadingPerson>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResponse<ReadingPerson>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromBody]PaginationRequest request)
         {
-            var entities = await service.GetAllAsync();
+            if (request == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var entities = await service.GetAllAsync(request);
             return Ok(entities);
         }
 
