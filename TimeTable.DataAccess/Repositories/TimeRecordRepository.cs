@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories;
+using TimeTable.DataAccess.Extensions;
 using TimeTable.DataAccess.Repositories.Base;
 
 namespace TimeTable.DataAccess.Repositories
@@ -23,9 +24,15 @@ namespace TimeTable.DataAccess.Repositories
                 x.EndDateTime != null &&
                 x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime);
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync() => await DbEntity.ToListAsync();
+        public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId) => await DbEntity.Where(x => x.PersonId == personId).ToListAsync();
+        public async Task<int> GetTotalRecordsAsync(int personId) => await DbEntity.CountAsync(x => x.PersonId == personId);
+
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber) => 
+            await DbEntity.OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId, int pageSize, int pageNumber) => 
+            await DbEntity.Where(x => x.PersonId == personId).OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
 
         public async Task<TimeRecordEntity> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
 

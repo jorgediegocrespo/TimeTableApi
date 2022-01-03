@@ -8,8 +8,11 @@ namespace TimeTable.DataAccess.Contracts.Repositories
     public interface ITimeRecordRepository
     {
         Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime);
-        Task<IEnumerable<TimeRecordEntity>> GetAllAsync();
-        Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId);
+
+        Task<int> GetTotalRecordsAsync();
+        Task<int> GetTotalRecordsAsync(int personId);
+        Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber);
+        Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber, int personId);
         Task<TimeRecordEntity> GetAsync(int id);
         Task<TimeRecordEntity> GetAsync(int id, int personId);
         Task AddAsync(TimeRecordEntity entity);

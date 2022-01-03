@@ -25,25 +25,40 @@ namespace TimeTable.Api.Controllers
             this.service = service;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("items")]
-        [ProducesResponseType(typeof(IEnumerable<ReadingTimeRecord>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResponse<ReadingTimeRecord>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromBody] PaginationRequest request)
         {
-            var entities = await service.GetAllAsync();
+            if (request == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var entities = await service.GetAllAsync(request);
             return Ok(entities);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("ownItems")]
-        [ProducesResponseType(typeof(IEnumerable<ReadingTimeRecord>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResponse<ReadingTimeRecord>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOwn()
+        public async Task<IActionResult> GetOwn([FromBody] PaginationRequest request)
         {
-            var entities = await service.GetAllOwnAsync();
+            if (request == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var entities = await service.GetAllOwnAsync(request);
             return Ok(entities);
         }
 

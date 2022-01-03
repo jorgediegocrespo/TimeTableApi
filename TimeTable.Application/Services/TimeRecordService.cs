@@ -29,26 +29,36 @@ namespace TimeTable.Application.Services
             this.userService = userService;
         }
 
-        public async Task<IEnumerable<ReadingTimeRecord>> GetAllAsync()
+        public async Task<PaginatedResponse<ReadingTimeRecord>> GetAllAsync(PaginationRequest request)
         {
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync();
-                    return allEntities.Select(x => MapReading(x));
+                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
+                    int count = await repository.GetTotalRecordsAsync();
+                    return new PaginatedResponse<ReadingTimeRecord>
+                    {
+                        TotalRegisters = count,
+                        Result = allEntities.Select(x => MapReading(x))
+                    };
                 });
         }
 
-        public async Task<IEnumerable<ReadingTimeRecord>> GetAllOwnAsync()
+        public async Task<PaginatedResponse<ReadingTimeRecord>> GetAllOwnAsync(PaginationRequest request)
         {
             int? personId = await userService.GetContextPersonIdAsync();
             AsyncRetryPolicy retryPolity = GetRetryPolicy();
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(personId.Value);
-                    return allEntities.Select(x => MapReading(x));
+                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber, personId.Value);
+                    int count = await repository.GetTotalRecordsAsync(personId.Value);
+                    return new PaginatedResponse<ReadingTimeRecord>
+                    {
+                        TotalRegisters = count,
+                        Result = allEntities.Select(x => MapReading(x))
+                    };
                 });
         }
 

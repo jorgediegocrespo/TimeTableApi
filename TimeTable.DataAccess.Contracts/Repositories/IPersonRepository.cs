@@ -7,7 +7,8 @@ namespace TimeTable.DataAccess.Contracts.Repositories
     public interface IPersonRepository
     {
         Task<bool> ExistsAsync(int id, string name);
-        Task<IEnumerable<PersonEntity>> GetAllAsync();
+        Task<int> GetTotalRecordsAsync();
+        Task<IEnumerable<PersonEntity>> GetAllAsync(int pageSize, int pageNumber);
         Task<PersonEntity> GetAsync(int id);
         Task<PersonEntity> GetAsync(string userId);
         Task AddAsync(PersonEntity entity);

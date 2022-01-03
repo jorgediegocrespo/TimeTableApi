@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.DataAccess.Contracts.Entities;
 using TimeTable.DataAccess.Contracts.Repositories;
+using TimeTable.DataAccess.Extensions;
 using TimeTable.DataAccess.Repositories.Base;
 
 namespace TimeTable.DataAccess.Repositories
@@ -19,7 +21,10 @@ namespace TimeTable.DataAccess.Repositories
                 x.Name.ToLowerInvariant() == name.ToLowerInvariant() &&
                 x.Id != id);
 
-        public async Task<IEnumerable<PersonEntity>> GetAllAsync() => await DbEntity.ToListAsync();
+        public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
+
+        public async Task<IEnumerable<PersonEntity>> GetAllAsync(int pageSize, int pageNumber) => 
+            await DbEntity.OrderBy(x => x.Name).Paginate(pageSize, pageNumber).ToListAsync();
 
         public async Task<PersonEntity> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
         
