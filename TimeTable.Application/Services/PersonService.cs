@@ -1,5 +1,4 @@
 ﻿using Polly.Retry;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,7 +35,6 @@ namespace TimeTable.Application.Services
             return await retryPolity.ExecuteAsync(
                 async () =>
                 {
-                    PaginatedResponse<ReadingPerson> result = new PaginatedResponse<ReadingPerson>();
                     IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
                     int count = await repository.GetTotalRecordsAsync();
                     return new PaginatedResponse<ReadingPerson>
