@@ -5,14 +5,14 @@ namespace TimeTable.Application.Configuration
 {
     public class AppConfig : IAppConfig
     {
-        private readonly IConfiguration _configuracion;
+        private readonly IConfiguration configuracion;
 
         public AppConfig(IConfiguration configuration)
         {
-            _configuracion = configuration;
+            configuracion = configuration;
         }
 
-        public int MaxTrys => int.Parse(_configuracion.GetSection("Polly:MaxTrys").Value);
-        public int SecondToWait => int.Parse(_configuracion.GetSection("Polly:TimeDelay").Value);
+        public int MaxTrys => int.Parse(configuracion.GetSection("Polly:MaxTrys").Value);
+        public int SecondToWait => int.Parse(configuracion.GetSection("Polly:TimeDelay").Value);
     }
 }

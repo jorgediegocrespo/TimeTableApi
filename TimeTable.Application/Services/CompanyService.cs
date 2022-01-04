@@ -1,5 +1,4 @@
-﻿using Polly.Retry;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
@@ -26,31 +25,22 @@ namespace TimeTable.Application.Services
 
         public async Task<Company> GetAsync()
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(
-                async () =>
-                {
-                    CompanyEntity company = await repository.GetAsync();
-                    return new Company()
-                    {
-                        Id = company.Id,
-                        Name = company.Name,
-                    };
-                });
+            CompanyEntity company = await repository.GetAsync();
+            return new Company()
+            {
+                Id = company.Id,
+                Name = company.Name,
+            };
         }
 
         public async Task UpdateAsync(Company businessModel)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () =>
-            {
-                CompanyEntity entity = await repository.GetAsync();
-                ValidateEntityToUpdate(entity, businessModel);
-                MapUpdating(entity, businessModel);
+            CompanyEntity entity = await repository.GetAsync();
+            ValidateEntityToUpdate(entity, businessModel);
+            MapUpdating(entity, businessModel);
 
-                await repository.UpdateAsync(entity);
-                await unitOfWork.SaveChangesAsync();
-            });
+            await repository.UpdateAsync(entity);
+            await unitOfWork.SaveChangesAsync();
         }
 
         private void ValidateEntityToUpdate(CompanyEntity entity, Company businessModel)

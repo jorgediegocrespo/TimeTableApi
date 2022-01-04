@@ -1,5 +1,4 @@
-﻿using Polly.Retry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
@@ -31,28 +30,19 @@ namespace TimeTable.Application.Services
 
         public async Task<PaginatedResponse<ReadingPerson>> GetAllAsync(PaginationRequest request)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(
-                async () =>
-                {
-                    IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
-                    int count = await repository.GetTotalRecordsAsync();
-                    return new PaginatedResponse<ReadingPerson>
-                    {
-                        TotalRegisters = count,
-                        Result = allEntities.Select(x => MapReading(x))
-                    };
-                });
+            IEnumerable<PersonEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
+            int count = await repository.GetTotalRecordsAsync();
+            return new PaginatedResponse<ReadingPerson>
+            {
+                TotalRegisters = count,
+                Result = allEntities.Select(x => MapReading(x))
+            };
         }
 
         public async Task<ReadingPerson> GetAsync(int id)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () =>
-            {
-                PersonEntity entity = await repository.GetAsync(id);
-                return MapReading(entity);
-            });
+            PersonEntity entity = await repository.GetAsync(id);
+            return MapReading(entity);
         }
 
         public async Task<ReadingPerson> GetOwnAsync()
@@ -63,9 +53,7 @@ namespace TimeTable.Application.Services
 
         public async Task<int> AddAsync(CreatingPerson businessModel)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () =>
-                         await unitOfWork.SaveChangesInTransactionAsync(async () =>
+            return await unitOfWork.SaveChangesInTransactionAsync(async () =>
             {
                 await ValidateEntityToAddAsync(businessModel);
                 string userId = await userService.RegisterAsync(new RegisterUserInfo
@@ -81,34 +69,28 @@ namespace TimeTable.Application.Services
                 await unitOfWork.SaveChangesAsync();
 
                 return entity.Id;
-            }));
+            });
         }
 
         public async Task UpdateAsync(UpdatingPerson businessModel)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () =>
-            {
-                PersonEntity entity = await repository.GetAsync(businessModel.Id);
-                await ValidateEntityToUpdateAsync(entity, businessModel);
-                MapUpdating(entity, businessModel);
-                await repository.UpdateAsync(entity);
-                await unitOfWork.SaveChangesAsync();
-            });
+            PersonEntity entity = await repository.GetAsync(businessModel.Id);
+            await ValidateEntityToUpdateAsync(entity, businessModel);
+            MapUpdating(entity, businessModel);
+            await repository.UpdateAsync(entity);
+            await unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () =>
-                  await unitOfWork.ExecuteInTransactionAsync(async () =>
+            await unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 PersonEntity person = await repository.GetAsync(id);
                 ValidateEntityToDelete(person, id);
                 await repository.DeleteAsync(id);
                 await unitOfWork.SaveChangesAsync();
                 await userService.DeleteAsync(person.UserId);
-            }));
+            });
         }
 
         public async Task DeleteOwnAsync()

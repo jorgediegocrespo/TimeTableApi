@@ -9,15 +9,15 @@ namespace TimeTable.Api.Middleware
 {
     public class LogMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly ILoggerService _loggerService;
-        private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
+        private readonly RequestDelegate next;
+        private readonly ILoggerService loggerService;
+        private readonly RecyclableMemoryStreamManager recyclableMemoryStreamManager;
 
         public LogMiddleware(RequestDelegate next, ILoggerService loggerService)
         {
-            _next = next;
-            _loggerService = loggerService;
-            _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
+            this.next = next;
+            this.loggerService = loggerService;
+            recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         }
 
         public async Task Invoke(HttpContext context)
@@ -29,10 +29,10 @@ namespace TimeTable.Api.Middleware
         private async Task LogRequest(HttpContext context)
         {
             context.Request.EnableBuffering();
-            await using MemoryStream requestStream = _recyclableMemoryStreamManager.GetStream();
+            await using MemoryStream requestStream = recyclableMemoryStreamManager.GetStream();
             await context.Request.Body.CopyToAsync(requestStream);
 
-            await _loggerService.LogInformation($"Http Request Information:{Environment.NewLine}" +
+            await loggerService.LogInformation($"Http Request Information:{Environment.NewLine}" +
                                    $"Schema:{context.Request.Scheme} " +
                                    $"Host: {context.Request.Host} " +
                                    $"Path: {context.Request.Path} " +
@@ -65,16 +65,16 @@ namespace TimeTable.Api.Middleware
         {
             Stream originalBodyStream = context.Response.Body;
 
-            await using MemoryStream responseBody = _recyclableMemoryStreamManager.GetStream();
+            await using MemoryStream responseBody = recyclableMemoryStreamManager.GetStream();
             context.Response.Body = responseBody;
 
-            await _next(context);
+            await next(context);
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             string text = await new StreamReader(context.Response.Body).ReadToEndAsync();
             context.Response.Body.Seek(0, SeekOrigin.Begin);
 
-            await _loggerService.LogInformation($"Http Response Information:{Environment.NewLine}" +
+            await loggerService.LogInformation($"Http Response Information:{Environment.NewLine}" +
                                    $"Schema:{context.Request.Scheme} " +
                                    $"Host: {context.Request.Host} " +
                                    $"Path: {context.Request.Path} " +

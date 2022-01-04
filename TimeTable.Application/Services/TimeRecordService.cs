@@ -1,5 +1,4 @@
-﻿using Polly.Retry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
@@ -19,8 +18,8 @@ namespace TimeTable.Application.Services
         private readonly ITimeRecordRepository repository;
         private readonly IUserService userService;
 
-        public TimeRecordService(IUnitOfWork unitOfWork, 
-                                 ITimeRecordRepository repository, 
+        public TimeRecordService(IUnitOfWork unitOfWork,
+                                 ITimeRecordRepository repository,
                                  IAppConfig appConfig,
                                  IUserService userService)
             : base(unitOfWork, appConfig)
@@ -31,96 +30,66 @@ namespace TimeTable.Application.Services
 
         public async Task<PaginatedResponse<ReadingTimeRecord>> GetAllAsync(PaginationRequest request)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(
-                async () =>
-                {
-                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
-                    int count = await repository.GetTotalRecordsAsync();
-                    return new PaginatedResponse<ReadingTimeRecord>
-                    {
-                        TotalRegisters = count,
-                        Result = allEntities.Select(x => MapReading(x))
-                    };
-                });
+            IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber);
+            int count = await repository.GetTotalRecordsAsync();
+            return new PaginatedResponse<ReadingTimeRecord>
+            {
+                TotalRegisters = count,
+                Result = allEntities.Select(x => MapReading(x))
+            };
         }
 
         public async Task<PaginatedResponse<ReadingTimeRecord>> GetAllOwnAsync(PaginationRequest request)
         {
             int? personId = await userService.GetContextPersonIdAsync();
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(
-                async () =>
-                {
-                    IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber, personId.Value);
-                    int count = await repository.GetTotalRecordsAsync(personId.Value);
-                    return new PaginatedResponse<ReadingTimeRecord>
-                    {
-                        TotalRegisters = count,
-                        Result = allEntities.Select(x => MapReading(x))
-                    };
-                });
+            IEnumerable<TimeRecordEntity> allEntities = await repository.GetAllAsync(request.PageSize, request.PageNumber, personId.Value);
+            int count = await repository.GetTotalRecordsAsync(personId.Value);
+            return new PaginatedResponse<ReadingTimeRecord>
+            {
+                TotalRegisters = count,
+                Result = allEntities.Select(x => MapReading(x))
+            };
         }
 
         public async Task<ReadingTimeRecord> GetAsync(int id)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () =>
-            {
-                TimeRecordEntity entity = await repository.GetAsync(id);
-                return MapReading(entity);
-            });
+            TimeRecordEntity entity = await repository.GetAsync(id);
+            return MapReading(entity);
         }
 
         public async Task<ReadingTimeRecord> GetOwnAsync(int id)
         {
             int? personId = await userService.GetContextPersonIdAsync();
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () =>
-            {
-                TimeRecordEntity entity = await repository.GetAsync(id, personId.Value);
-                return MapReading(entity);
-            });
+            TimeRecordEntity entity = await repository.GetAsync(id, personId.Value);
+            return MapReading(entity);
         }
 
         public async Task<int> AddAsync(CreatingTimeRecord businessModel)
         {
             int? personId = await userService.GetContextPersonIdAsync();
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            return await retryPolity.ExecuteAsync(async () =>
-            {
-                await ValidateEntityToAddAsync(businessModel);
-                TimeRecordEntity entity = MapCreating(businessModel, personId.Value);
-                await repository.AddAsync(entity);
-                await unitOfWork.SaveChangesAsync();
+            await ValidateEntityToAddAsync(businessModel);
+            TimeRecordEntity entity = MapCreating(businessModel, personId.Value);
+            await repository.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
 
-                return entity.Id;
-            });
+            return entity.Id;
         }
 
         public async Task UpdateAsync(UpdatingTimeRecord businessModel)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () =>
-            {
-                TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
-                await ValidateEntityToUpdateAsync(entity, businessModel);
-                MapUpdating(entity, businessModel);
-                await repository.AddAsync(entity);
-                await unitOfWork.SaveChangesAsync();
-            });
+            TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
+            await ValidateEntityToUpdateAsync(entity, businessModel);
+            MapUpdating(entity, businessModel);
+            await repository.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            AsyncRetryPolicy retryPolity = GetRetryPolicy();
-            await retryPolity.ExecuteAsync(async () =>
-            {
-                TimeRecordEntity entity = await repository.GetAsync(id);
-                await ValidateEntityToDeleteAsync(entity);
-                await repository.DeleteAsync(id);
-                await unitOfWork.SaveChangesAsync();
-            });
+            TimeRecordEntity entity = await repository.GetAsync(id);
+            await ValidateEntityToDeleteAsync(entity);
+            await repository.DeleteAsync(id);
+            await unitOfWork.SaveChangesAsync();
         }
 
         private ReadingTimeRecord MapReading(TimeRecordEntity entity)

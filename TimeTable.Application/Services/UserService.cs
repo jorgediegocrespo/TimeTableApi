@@ -55,6 +55,8 @@ namespace TimeTable.Application.Services
 
         public async Task<string> LoginAsync(LoginUserInfo userInfo)
         {
+            System.Diagnostics.Debug.WriteLine("***** LoginAsync");
+            throw new Exception("Test error");
             SignInResult result = await signInManager.PasswordSignInAsync(userInfo.UserName, userInfo.Password, false, false);
             return result.Succeeded ? await GetToken(userInfo) : null;
         }
