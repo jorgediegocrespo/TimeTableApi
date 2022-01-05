@@ -8,7 +8,7 @@ namespace TimeTable.Application.Exceptions
 
         public string Code { get; protected set; }
 
-        public NotValidOperationException(string code, string description) : base(description)
+        public NotValidOperationException(string code, string description) : base(code)
         {
             Code = code;
             Description = description;
