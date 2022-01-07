@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
@@ -41,7 +40,7 @@ namespace TimeTable.Application.Tests.Services
         }
 
         [TestMethod]
-        public async Task UpdateCompany_IdError()
+        public async Task UpdateCompany_ItemNotExistsError()
         {
             CompanyEntity givenCompany = GivenCompany();
             companyRepositoryMock.Setup(x => x.GetAsync()).ReturnsAsync(givenCompany);
