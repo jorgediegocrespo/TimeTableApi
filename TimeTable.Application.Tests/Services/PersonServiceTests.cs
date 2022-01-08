@@ -49,7 +49,7 @@ namespace TimeTable.Application.Tests.Services
         }
 
         [TestMethod]
-        public async Task GetOk_Ok()
+        public async Task Get_Ok()
         {
             int personId = 1;
             PersonEntity givenPerson = GivenDefaultPerson(personId);
