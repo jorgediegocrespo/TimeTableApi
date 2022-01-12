@@ -19,7 +19,8 @@ namespace TimeTable.DataAccess.Tests.Repositories
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
-            
+            timeTableContext.ChangeTracker.Clear();
+
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             bool result = await personRepository.ExistsAsync(2, "person 1");
 
@@ -32,6 +33,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" }); 
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             bool result = await personRepository.ExistsAsync(2, "PERSON 1");
@@ -45,6 +47,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             bool result = await personRepository.ExistsAsync(2, " person 1  ");
@@ -58,6 +61,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             bool result = await personRepository.ExistsAsync(2, "Person 2");
@@ -71,6 +75,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             bool result = await personRepository.ExistsAsync(1, "Person 1");
@@ -93,6 +98,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
                 new PersonEntity { Id = 7, Name = "Person 7" }
             });
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             int result = await personRepository.GetTotalRecordsAsync();
@@ -116,14 +122,15 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var result = await personRepository.GetAllAsync(2, 1);
             var resultList = result.ToList();
 
             Assert.AreEqual(2, resultList.Count);
-            Assert.AreEqual(sourceList.First(x => x.Id == 1), resultList[0]);
-            Assert.AreEqual(sourceList.First(x => x.Id == 7), resultList[1]);
+            Assert.AreEqual(1, resultList[0].Id);
+            Assert.AreEqual(7, resultList[1].Id);
         }
 
         [TestMethod]
@@ -142,14 +149,15 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var result = await personRepository.GetAllAsync(2, 2);
             var resultList = result.ToList();
 
             Assert.AreEqual(2, resultList.Count);
-            Assert.AreEqual(sourceList.First(x => x.Id == 2), resultList[0]);
-            Assert.AreEqual(sourceList.First(x => x.Id == 6), resultList[1]);
+            Assert.AreEqual(2, resultList[0].Id);
+            Assert.AreEqual(6, resultList[1].Id);
         }
 
         [TestMethod]
@@ -168,13 +176,14 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var result = await personRepository.GetAllAsync(2, 4);
             var resultList = result.ToList();
 
             Assert.AreEqual(1, resultList.Count);
-            Assert.AreEqual(sourceList.First(x => x.Id == 4), resultList[0]);
+            Assert.AreEqual(4, resultList[0].Id);
         }
 
         [TestMethod]
@@ -193,11 +202,12 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var result = await personRepository.GetAsync(3);
 
-            Assert.AreEqual(sourceList.First(x => x.Id == 3), result);
+            Assert.AreEqual(3, result.Id);
         }
 
         [TestMethod]
@@ -216,30 +226,31 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var result = await personRepository.GetAsync("User5");
 
-            Assert.AreEqual(sourceList.First(x => x.Id == 3), result);
+            Assert.AreEqual(3, result.Id);
         }
 
         [TestMethod]
         public async Task Add_Ok()
         {
-            //TODO Use local DB
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
-            
+            timeTableContext.ChangeTracker.Clear();
+
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             await personRepository.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
 
+            timeTableContext.ChangeTracker.Clear();
             Assert.AreEqual(1, timeTableContext.People.Count());
         }
 
         [TestMethod]
         public async Task Update_Ok()
         {
-            //TODO Use local DB
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
@@ -255,12 +266,14 @@ namespace TimeTable.DataAccess.Tests.Repositories
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.People.AddAsync(toUpdate);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             toUpdate.Name = "Updated";
             await personRepository.UpdateAsync(toUpdate);
             await timeTableContext.SaveChangesAsync();
 
+            timeTableContext.ChangeTracker.Clear();
             var validation = await timeTableContext.People.FirstAsync(x => x.Id == 8);
             Assert.AreEqual(validation.Name, "Updated");
         }
@@ -268,7 +281,6 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Delete_Ok()
         {
-            //TODO Use local DB
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
@@ -282,11 +294,13 @@ namespace TimeTable.DataAccess.Tests.Repositories
             };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             await personRepository.DeleteAsync(4);
             await timeTableContext.SaveChangesAsync();
 
+            timeTableContext.ChangeTracker.Clear();
             Assert.AreEqual(6, timeTableContext.People.Count());
         }
     }

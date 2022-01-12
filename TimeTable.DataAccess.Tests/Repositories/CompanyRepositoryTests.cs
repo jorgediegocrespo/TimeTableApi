@@ -26,9 +26,9 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Update_OK()
         {
-            //TODO Use local DB
             TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await AddCompanyAsync(timeTableContext);
+            timeTableContext.ChangeTracker.Clear();
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
             CompanyEntity company = await timeTableContext.Companies.FirstOrDefaultAsync();
@@ -36,6 +36,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             await companyRepository.UpdateAsync(company);
             await timeTableContext.SaveChangesAsync();
 
+            timeTableContext.ChangeTracker.Clear();
             CompanyEntity result = await companyRepository.GetAsync();
             Assert.AreEqual("Changed name S.L.", result.Name);
         }
