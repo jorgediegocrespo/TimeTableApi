@@ -11,14 +11,10 @@ namespace TimeTable.DataAccess.Tests.Repositories
     [TestClass]
     public class CompanyRepositoryTests : BaseRepositoryTests
     {
-        public CompanyRepositoryTests()
-        { }
-
         [TestMethod]
         public async Task Get_OK()
         {
-            string dbContextName = Guid.NewGuid().ToString();
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(dbContextName);
+            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await AddCompanyAsync(timeTableContext);
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
@@ -30,16 +26,17 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Update_OK()
         {
-            string dbContextName = Guid.NewGuid().ToString();
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(dbContextName);
+            //TODO Use local DB
+            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
             await AddCompanyAsync(timeTableContext);
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
             CompanyEntity company = await timeTableContext.Companies.FirstOrDefaultAsync();
             company.Name = "Changed name S.L.";
             await companyRepository.UpdateAsync(company);
-            CompanyEntity result = await companyRepository.GetAsync();
+            await timeTableContext.SaveChangesAsync();
 
+            CompanyEntity result = await companyRepository.GetAsync();
             Assert.AreEqual("Changed name S.L.", result.Name);
         }
 
