@@ -19,7 +19,6 @@ namespace TimeTable.CrossCutting.Register
                 var context = services.GetService<TimeTableDbContext>();
                 context.Database.Migrate();
 
-
                 var userManager = services.GetService<UserManager<IdentityUser>>();
                 var rolesManager = services.GetService<RoleManager<IdentityRole>>();
 

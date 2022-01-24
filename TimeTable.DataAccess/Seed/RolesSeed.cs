@@ -17,10 +17,10 @@ namespace TimeTable.DataAccess.Seed
 
 		public async Task SeedAsync(TimeTableDbContext context, IConfiguration configuration)
 		{
-			await AddDefaultCompany(context);
+			await AddDefaultRoles(context);
 		}
 
-		private async Task AddDefaultCompany(TimeTableDbContext context)
+		private async Task AddDefaultRoles(TimeTableDbContext context)
 		{
 			if (context.Roles.Any())
 				return;

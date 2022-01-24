@@ -32,10 +32,7 @@ namespace TimeTable.Api.Controllers
         public async Task<IActionResult> Get()
         {
             Company entity = await service.GetAsync();
-            if (entity == null)
-                return NotFound();
-            else
-                return Ok(entity);
+            return Ok(entity);
         }
 
         [HttpPut]
