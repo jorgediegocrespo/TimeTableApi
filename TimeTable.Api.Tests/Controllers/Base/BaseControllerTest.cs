@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using TimeTable.Business.ConstantValues;
 using TimeTable.DataAccess;
@@ -19,7 +16,11 @@ namespace TimeTable.Api.Tests.Controllers.Base
 {
     public class BaseControllerTest
     {
-        private readonly string personUrl = "/api/person";
+        protected TimeTableDbContext BuildContext(string dbContextName)
+        {
+            DbContextOptions<TimeTableDbContext> options = new DbContextOptionsBuilder<TimeTableDbContext>().UseInMemoryDatabase(dbContextName).Options;
+            return new TimeTableDbContext(options);
+        }
 
         protected WebApplicationFactory<Startup> BuildWebApplicationFactory(string dbContextName, string userRole)
         {
@@ -34,7 +35,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
                     services.AddDbContext<TimeTableDbContext>(options => options.UseInMemoryDatabase(dbContextName));
 
-                    services.AddSingleton<IAuthorizationHandler, AllowAnonimousHandler>();
+                    services.AddSingleton<IAuthorizationHandler>(x => new ManageRoleAccessHandler(userRole));
                     services.AddControllers(opt => opt.Filters.Add(new FakeUserFilter(userRole)));
                 });
             });
@@ -92,16 +93,16 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
             IdentityUser user = new IdentityUser
             {
-                Id = "724cd46f-814a-449c-b80b-f360228437f8",
-                UserName = "Admin",
-                Email = "admin@email.com",
+                Id = Constants.AdminNameIdentifier,
+                UserName = Constants.AdminName,
+                Email = Constants.AdminEmail,
             };
 
-            await userManager.CreateAsync(user, "Admin_1234");
+            await userManager.CreateAsync(user, Constants.AdminPassword);
             await userManager.AddToRoleAsync(user, RolesConsts.ADMIN);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = 1, Name = "Admin", UserId = userId, IsDefault = true });
+            await context.People.AddAsync(new PersonEntity() { Id = 1, Name = Constants.AdminName, UserId = userId, IsDefault = true });
 
             await context.SaveChangesAsync();
         }
@@ -113,64 +114,18 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
             IdentityUser user = new IdentityUser
             {
-                Id = "0d3e5510-1ec3-41bb-9ed8-66da900a108e",
-                UserName = "Employee",
-                Email = "employee@email.com",
+                Id = Constants.EmployeeNameIdentifier,
+                UserName = Constants.EmployeeName,
+                Email = Constants.EmployeeEmail,
             };
 
-            await userManager.CreateAsync(user, "Employee_1234");
+            await userManager.CreateAsync(user, Constants.EmployeePassword);
             await userManager.AddToRoleAsync(user, RolesConsts.EMPLOYEE);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = 2, Name = "Employee", UserId = userId, IsDefault = true });
+            await context.People.AddAsync(new PersonEntity() { Id = 2, Name = Constants.EmployeePassword, UserId = userId, IsDefault = true });
 
             await context.SaveChangesAsync();
-        }
-    }
-
-    public class FakeUserFilter : IAsyncActionFilter
-    {
-        private readonly string role;
-
-        public FakeUserFilter(string role)
-        {
-            this.role = role;
-        }
-
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            switch (role)
-            {
-                case RolesConsts.ADMIN:
-                    context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, "724cd46f-814a-449c-b80b-f360228437f8"),
-                        new Claim(ClaimTypes.Name, "Admin"),
-                        new Claim(ClaimTypes.Email, "admin@email.com"),
-                    }, "fakeAdminTest"));
-                    break;
-                case RolesConsts.EMPLOYEE:
-                    context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, "0d3e5510-1ec3-41bb-9ed8-66da900a108e"),
-                        new Claim(ClaimTypes.Name, "Employee"),
-                        new Claim(ClaimTypes.Email, "employee@email.com"),
-                    }, "fakeEmployeeTest"));
-                    break;
-            }
-
-            await next();
-        }
-    }
-
-    public class AllowAnonimousHandler : IAuthorizationHandler
-    {
-        public Task HandleAsync(AuthorizationHandlerContext context)
-        {
-            foreach (var requierements in context.PendingRequirements.ToList())
-                context.Succeed(requierements);
-
-            return Task.CompletedTask;
         }
     }
 }
