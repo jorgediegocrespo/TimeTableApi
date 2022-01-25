@@ -49,7 +49,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> GetById([FromQuery]int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var entity = await service.GetAsync(id);
             if (entity == null)
@@ -113,7 +113,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Delete([FromQuery]int id)
+        public async Task<IActionResult> Delete(int id)
         {
             await service.DeleteAsync(id);
             return NoContent();

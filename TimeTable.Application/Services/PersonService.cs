@@ -101,12 +101,14 @@ namespace TimeTable.Application.Services
 
         private ReadingPerson MapReading(PersonEntity entity)
         {
-            return new ReadingPerson()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                IsDefault = entity.IsDefault,
-            };
+            return entity == null ? 
+                null : 
+                new ReadingPerson()
+                {
+                    Id = entity.Id,
+                    Name = entity.Name,
+                    IsDefault = entity.IsDefault,
+                };
         }
 
         private PersonEntity MapCreating(CreatingPerson businessModel)

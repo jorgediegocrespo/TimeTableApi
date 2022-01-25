@@ -22,7 +22,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_Unauthorized()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
 
             HttpClient client = factory.CreateClient();
             HttpResponseMessage response = await client.GetAsync($"{url}/item");
@@ -33,7 +33,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_Ok()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
 
             HttpResponseMessage response = await client.GetAsync($"{url}/item");
@@ -46,7 +46,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Put_Unauthorized()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
 
             StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
@@ -58,7 +58,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Put_NullBadRequest()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
 
             StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
@@ -71,7 +71,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_NoNameBadRequest()
         {
             string dbContextName = Guid.NewGuid().ToString();
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
@@ -88,7 +88,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_TooSortNameBadRequest()
         {
             string dbContextName = Guid.NewGuid().ToString();
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
@@ -105,7 +105,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_TooLongNameBadRequest()
         {
             string dbContextName = Guid.NewGuid().ToString();
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
@@ -122,7 +122,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Ok()
         {
             string dbContextName = Guid.NewGuid().ToString();
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();

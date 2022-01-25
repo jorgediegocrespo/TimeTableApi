@@ -18,7 +18,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_Ok()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.AdminPassword };
@@ -33,7 +33,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NullBadRequest()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
             StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
@@ -45,7 +45,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NoLoginBadRequest()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = null, Password = Constants.AdminPassword };
@@ -58,7 +58,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NoPasswordBadRequest()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = null };
@@ -71,7 +71,7 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_InvalidLoginBadRequest()
         {
-            WebApplicationFactory<Startup> factory = BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.EmployeePassword };

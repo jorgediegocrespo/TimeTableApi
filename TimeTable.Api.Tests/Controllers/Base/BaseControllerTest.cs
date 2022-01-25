@@ -22,7 +22,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
             return new TimeTableDbContext(options);
         }
 
-        protected WebApplicationFactory<Startup> BuildWebApplicationFactory(string dbContextName, string userRole)
+        protected async Task<WebApplicationFactory<Startup>> BuildWebApplicationFactory(string dbContextName, string userRole)
         {
             WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
             factory = factory.WithWebHostBuilder(builder =>
@@ -40,12 +40,11 @@ namespace TimeTable.Api.Tests.Controllers.Base
                 });
             });
 
-            SeedDatabaseContext(factory);
-
+            await SeedDatabaseContext(factory);
             return factory;
         }
 
-        private void SeedDatabaseContext(WebApplicationFactory<Startup> webApplicationFactory)
+        protected async Task SeedDatabaseContext(WebApplicationFactory<Startup> webApplicationFactory)
         {
             using (var scope = webApplicationFactory.Services.CreateScope())
             {
@@ -53,19 +52,19 @@ namespace TimeTable.Api.Tests.Controllers.Base
                 IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 IServiceProvider serviceProvider = scope.ServiceProvider;
 
-                InitializeDbForTests(context, configuration, serviceProvider);
+                await InitializeDbForTests(context, configuration, serviceProvider);
             }
         }
 
-        private void InitializeDbForTests(TimeTableDbContext context, IConfiguration configuration, IServiceProvider serviceProvider)
+        private async Task InitializeDbForTests(TimeTableDbContext context, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             UserManager<IdentityUser> userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
             RoleManager<IdentityRole> rolesManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
 
-            AddDefaultCompany(context).Wait();
-            AddDefaultRoles(rolesManager, context).Wait();
-            AddAdminPerson(userManager, context).Wait();
-            AddEmployeePerson(userManager, context).Wait();
+            await AddDefaultCompany(context);
+            await AddDefaultRoles(rolesManager, context);
+            await AddAdminPerson(userManager, context);
+            await AddEmployeePerson(userManager, context);
         }
 
         private async Task AddDefaultCompany(TimeTableDbContext context)
@@ -88,12 +87,11 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
         private async Task AddAdminPerson(UserManager<IdentityUser> userManager, TimeTableDbContext context)
         {
-            if (context.People.Any())
+            if (!string.IsNullOrWhiteSpace(Constants.AdminNameIdentifier))
                 return;
 
             IdentityUser user = new IdentityUser
             {
-                Id = Constants.AdminNameIdentifier,
                 UserName = Constants.AdminName,
                 Email = Constants.AdminEmail,
             };
@@ -102,19 +100,19 @@ namespace TimeTable.Api.Tests.Controllers.Base
             await userManager.AddToRoleAsync(user, RolesConsts.ADMIN);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = 1, Name = Constants.AdminName, UserId = userId, IsDefault = true });
+            await context.People.AddAsync(new PersonEntity() { Id = 1, Name = Constants.AdminName, UserId = userId, IsDefault = true });            
+            Constants.AdminNameIdentifier = userId;
 
             await context.SaveChangesAsync();
         }
 
         private async Task AddEmployeePerson(UserManager<IdentityUser> userManager, TimeTableDbContext context)
         {
-            if (context.People.Any())
+            if (!string.IsNullOrWhiteSpace(Constants.EmployeeNameIdentifier))
                 return;
 
             IdentityUser user = new IdentityUser
             {
-                Id = Constants.EmployeeNameIdentifier,
                 UserName = Constants.EmployeeName,
                 Email = Constants.EmployeeEmail,
             };
@@ -124,6 +122,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
             string userId = await userManager.GetUserIdAsync(user);
             await context.People.AddAsync(new PersonEntity() { Id = 2, Name = Constants.EmployeePassword, UserId = userId, IsDefault = true });
+            Constants.EmployeeNameIdentifier = userId;
 
             await context.SaveChangesAsync();
         }
