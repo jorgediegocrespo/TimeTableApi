@@ -18,7 +18,7 @@ namespace TimeTable.DataAccess.Repositories
 
         public async Task<bool> ExistsAsync(int id, string name) => 
             await DbEntity.AnyAsync(x => 
-                x.Name.ToLowerInvariant() == name.ToLowerInvariant() &&
+                x.Name.ToLowerInvariant().Trim() == name.ToLowerInvariant().Trim() &&
                 x.Id != id);
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();

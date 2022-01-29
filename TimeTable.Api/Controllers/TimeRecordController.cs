@@ -28,7 +28,6 @@ namespace TimeTable.Api.Controllers
         [HttpPost]
         [Route("items")]
         [ProducesResponseType(typeof(PaginatedResponse<ReadingTimeRecord>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
@@ -65,11 +64,10 @@ namespace TimeTable.Api.Controllers
         [HttpGet]
         [Route("items/{id}")]
         [ProducesResponseType(typeof(ReadingTimeRecord), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> GetById([FromQuery] int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var entity = await service.GetAsync(id);
             if (entity == null)
@@ -84,7 +82,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOwnById([FromQuery] int id)
+        public async Task<IActionResult> GetOwnById(int id)
         {
             var entity = await service.GetOwnAsync(id);
             if (entity == null)
@@ -96,7 +94,6 @@ namespace TimeTable.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Post([FromBody] CreatingTimeRecord item)
@@ -132,10 +129,9 @@ namespace TimeTable.Api.Controllers
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromQuery] int id)
+        public async Task<IActionResult> Delete(int id)
         {
             await service.DeleteAsync(id);
             return NoContent();

@@ -20,10 +20,10 @@ namespace TimeTable.DataAccess.Seed
 
         public async Task SeedAsync(TimeTableDbContext context, IConfiguration configuration)
 		{
-			await AddDefaultCompany(context);
+			await AddDefaultPeople(context);
 		}
 
-		private async Task AddDefaultCompany(TimeTableDbContext context)
+		private async Task AddDefaultPeople(TimeTableDbContext context)
 		{
 			if (context.People.Any())
 				return;

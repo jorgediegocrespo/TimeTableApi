@@ -8,7 +8,7 @@ namespace TimeTable.Business.Models
         public int Id { get; set; }
         public int PersonId { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
-        public DateTimeOffset EndDateTime { get; set; }
+        public DateTimeOffset? EndDateTime { get; set; }
     }
 
     public class CreatingTimeRecord
@@ -16,11 +16,12 @@ namespace TimeTable.Business.Models
         [Required]
         public DateTimeOffset StartDateTime { get; set; }
 
-        public DateTimeOffset EndDateTime { get; set; }
+        public DateTimeOffset? EndDateTime { get; set; }
     }
 
     public class UpdatingTimeRecord : CreatingTimeRecord
     {
+        [Required]
         public int Id { get; set; }
     }
 }

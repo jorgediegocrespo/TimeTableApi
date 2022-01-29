@@ -21,8 +21,8 @@ namespace TimeTable.DataAccess.Repositories
             await DbEntity.AnyAsync(x =>
                 x.Id != id &&
                 x.StartDateTime.UtcDateTime <= dateTime.UtcDateTime &&
-                x.EndDateTime != null &&
-                x.EndDateTime.UtcDateTime >= dateTime.UtcDateTime);
+                x.EndDateTime.HasValue &&
+                x.EndDateTime.Value.UtcDateTime >= dateTime.UtcDateTime);
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
 

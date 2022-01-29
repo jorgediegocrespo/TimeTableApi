@@ -80,7 +80,7 @@ namespace TimeTable.Application.Services
             TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
             await ValidateEntityToUpdateAsync(entity, businessModel);
             MapUpdating(entity, businessModel);
-            await repository.AddAsync(entity);
+            await repository.UpdateAsync(entity);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -94,13 +94,15 @@ namespace TimeTable.Application.Services
 
         private ReadingTimeRecord MapReading(TimeRecordEntity entity)
         {
-            return new ReadingTimeRecord()
-            {
-                Id = entity.Id,
-                PersonId = entity.PersonId,
-                StartDateTime = entity.StartDateTime,
-                EndDateTime = entity.EndDateTime,
-            };
+            return entity == null ?
+                null : 
+                new ReadingTimeRecord()
+                {
+                    Id = entity.Id,
+                    PersonId = entity.PersonId,
+                    StartDateTime = entity.StartDateTime,
+                    EndDateTime = entity.EndDateTime,
+                };
         }
 
         private TimeRecordEntity MapCreating(CreatingTimeRecord businessModel, int personId)
@@ -125,10 +127,10 @@ namespace TimeTable.Application.Services
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 
-            if (businessModel.EndDateTime == null)
+            if (!businessModel.EndDateTime.HasValue)
                 return;
 
-            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.EndDateTime);
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.EndDateTime.Value);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
         }
@@ -143,10 +145,10 @@ namespace TimeTable.Application.Services
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 
-            if (businessModel.EndDateTime == null)
+            if (!businessModel.EndDateTime.HasValue)
                 return;
 
-            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.EndDateTime);
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.EndDateTime.Value);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 
