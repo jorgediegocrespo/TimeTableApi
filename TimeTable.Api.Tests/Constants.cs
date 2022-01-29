@@ -2,12 +2,14 @@
 {
     public class Constants
     {
-        public static string AdminNameIdentifier;
+        public const string AdminNameIdentifier = "0d3e5510-1ec3-41bb-9ed8-66da900a108e";
+        public const int AdminId = 1; 
         public const string AdminEmail = "Admin";
         public const string AdminName = "admin@email.com";
         public const string AdminPassword = "Admin_1234";
 
-        public static string EmployeeNameIdentifier;
+        public const string EmployeeNameIdentifier = "724cd46f-814a-449c-b80b-f360228437f8";
+        public const int EmployeeId = 2; 
         public const string EmployeeEmail = "Employee";
         public const string EmployeeName = "employee@email.com";
         public const string EmployeePassword = "Employee_1234";

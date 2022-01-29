@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,7 +19,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
     {
         protected TimeTableDbContext BuildContext(string dbContextName)
         {
-            DbContextOptions<TimeTableDbContext> options = new DbContextOptionsBuilder<TimeTableDbContext>().UseInMemoryDatabase(dbContextName).Options;
+            DbContextOptions<TimeTableDbContext> options = new DbContextOptionsBuilder<TimeTableDbContext>().UseInMemoryDatabase(dbContextName).ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
             return new TimeTableDbContext(options);
         }
 
@@ -33,7 +34,9 @@ namespace TimeTable.Api.Tests.Controllers.Base
                     if (descriptorDbContext != null)
                         services.Remove(descriptorDbContext);
 
-                    services.AddDbContext<TimeTableDbContext>(options => options.UseInMemoryDatabase(dbContextName));
+                    services.AddDbContext<TimeTableDbContext>(options => options
+                        .UseInMemoryDatabase(dbContextName)
+                        .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
 
                     services.AddSingleton<IAuthorizationHandler>(x => new ManageRoleAccessHandler(userRole));
                     services.AddControllers(opt => opt.Filters.Add(new FakeUserFilter(userRole)));
@@ -87,11 +90,9 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
         private async Task AddAdminPerson(UserManager<IdentityUser> userManager, TimeTableDbContext context)
         {
-            if (!string.IsNullOrWhiteSpace(Constants.AdminNameIdentifier))
-                return;
-
             IdentityUser user = new IdentityUser
             {
+                Id = Constants.AdminNameIdentifier,
                 UserName = Constants.AdminName,
                 Email = Constants.AdminEmail,
             };
@@ -100,19 +101,16 @@ namespace TimeTable.Api.Tests.Controllers.Base
             await userManager.AddToRoleAsync(user, RolesConsts.ADMIN);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = 1, Name = Constants.AdminName, UserId = userId, IsDefault = true });            
-            Constants.AdminNameIdentifier = userId;
+            await context.People.AddAsync(new PersonEntity() { Id = Constants.AdminId, Name = Constants.AdminName, UserId = userId, IsDefault = true });            
 
             await context.SaveChangesAsync();
         }
 
         private async Task AddEmployeePerson(UserManager<IdentityUser> userManager, TimeTableDbContext context)
         {
-            if (!string.IsNullOrWhiteSpace(Constants.EmployeeNameIdentifier))
-                return;
-
             IdentityUser user = new IdentityUser
             {
+                Id = Constants.EmployeeNameIdentifier,
                 UserName = Constants.EmployeeName,
                 Email = Constants.EmployeeEmail,
             };
@@ -121,9 +119,8 @@ namespace TimeTable.Api.Tests.Controllers.Base
             await userManager.AddToRoleAsync(user, RolesConsts.EMPLOYEE);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = 2, Name = Constants.EmployeePassword, UserId = userId, IsDefault = true });
-            Constants.EmployeeNameIdentifier = userId;
-
+            await context.People.AddAsync(new PersonEntity() { Id = Constants.EmployeeId, Name = Constants.EmployeePassword, UserId = userId, IsDefault = false });
+            
             await context.SaveChangesAsync();
         }
     }
