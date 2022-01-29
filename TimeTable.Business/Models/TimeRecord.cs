@@ -21,6 +21,7 @@ namespace TimeTable.Business.Models
 
     public class UpdatingTimeRecord : CreatingTimeRecord
     {
+        [Required]
         public int Id { get; set; }
     }
 }

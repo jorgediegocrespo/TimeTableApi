@@ -94,13 +94,15 @@ namespace TimeTable.Application.Services
 
         private ReadingTimeRecord MapReading(TimeRecordEntity entity)
         {
-            return new ReadingTimeRecord()
-            {
-                Id = entity.Id,
-                PersonId = entity.PersonId,
-                StartDateTime = entity.StartDateTime,
-                EndDateTime = entity.EndDateTime,
-            };
+            return entity == null ?
+                null : 
+                new ReadingTimeRecord()
+                {
+                    Id = entity.Id,
+                    PersonId = entity.PersonId,
+                    StartDateTime = entity.StartDateTime,
+                    EndDateTime = entity.EndDateTime,
+                };
         }
 
         private TimeRecordEntity MapCreating(CreatingTimeRecord businessModel, int personId)
