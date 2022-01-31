@@ -20,6 +20,11 @@ namespace TimeTable.DataAccess.EntityConfig
                 .IsRequired(true)
                 .HasForeignKey(x => x.PersonId)
                 .IsRequired(true);
+
+            entityBuilder.HasQueryFilter(x => !x.IsDeleted);
+
+            entityBuilder.HasIndex(x => x.IsDeleted);
+            entityBuilder.HasIndex(x => x.PersonId);
         }
     }
 }

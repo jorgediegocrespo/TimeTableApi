@@ -1,8 +1,9 @@
-﻿namespace TimeTable.DataAccess.Contracts.Entities
+﻿using TimeTable.DataAccess.Contracts.Entities.Base;
+
+namespace TimeTable.DataAccess.Contracts.Entities
 {
-    public class CompanyEntity
+    public class CompanyEntity : BaseEntity
     {
-        public int Id { get; set; }
         public string Name { get; set; }
     }
 }
