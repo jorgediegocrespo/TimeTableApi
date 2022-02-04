@@ -17,9 +17,10 @@ namespace TimeTable.DataAccess.Repositories
         protected override DbSet<PersonEntity> DbEntity => dbContext.People;
 
         public async Task<bool> ExistsAsync(int id, string name) => 
-            await DbEntity.AnyAsync(x => 
-                x.Name.ToLowerInvariant().Trim() == name.ToLowerInvariant().Trim() &&
-                x.Id != id);
+            await DbEntity.Where(x => 
+                x.Name.ToLower().Trim() == name.ToLower().Trim() &&
+                x.Id != id)
+            .AnyAsync();
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
 

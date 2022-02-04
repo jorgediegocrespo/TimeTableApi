@@ -15,7 +15,10 @@ namespace TimeTable.DataAccess.EntityConfig
 
             entityBuilder.Property(x => x.Name).IsRequired(true);
 
+            entityBuilder.HasQueryFilter(x => !x.IsDeleted);
+
             entityBuilder.HasIndex(a => a.Name).IsUnique(true);
+            entityBuilder.HasIndex(x => x.IsDeleted);
         }
     }
 }
