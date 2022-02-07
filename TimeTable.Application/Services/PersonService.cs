@@ -108,6 +108,7 @@ namespace TimeTable.Application.Services
                     Id = entity.Id,
                     Name = entity.Name,
                     IsDefault = entity.IsDefault,
+                    RowVersion = entity.RowVersion,
                 };
         }
 
@@ -124,6 +125,7 @@ namespace TimeTable.Application.Services
         {
             entity.Name = businessModel.Name;
             entity.IsDefault = false;
+            entity.RowVersion = businessModel.RowVersion;
         }
 
         private async Task ValidateEntityToAddAsync(CreatingPerson businessModel)

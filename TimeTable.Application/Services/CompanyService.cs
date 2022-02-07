@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TimeTable.Application.Constants;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
@@ -25,12 +26,8 @@ namespace TimeTable.Application.Services
 
         public async Task<Company> GetAsync()
         {
-            CompanyEntity company = await repository.GetAsync();
-            return new Company()
-            {
-                Id = company.Id,
-                Name = company.Name,
-            };
+            CompanyEntity entity = await repository.GetAsync();
+            return MapReading(entity);
         }
 
         public async Task UpdateAsync(Company businessModel)
@@ -43,15 +40,26 @@ namespace TimeTable.Application.Services
             await unitOfWork.SaveChangesAsync();
         }
 
-        private void ValidateEntityToUpdate(CompanyEntity entity, Company businessModel)
+        private Company MapReading(CompanyEntity entity)
         {
-            if (entity.Id != businessModel.Id)
-                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
+            return new Company()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                RowVersion = entity.RowVersion,
+            };
         }
 
         private void MapUpdating(CompanyEntity entity, Company businessModel)
         {
             entity.Name = businessModel.Name;
+            entity.RowVersion = businessModel.RowVersion;
+        }
+
+        private void ValidateEntityToUpdate(CompanyEntity entity, Company businessModel)
+        {
+            if (entity.Id != businessModel.Id)
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There is not any company with the id {businessModel.Id}");
         }
     }
 }

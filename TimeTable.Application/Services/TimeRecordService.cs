@@ -102,6 +102,7 @@ namespace TimeTable.Application.Services
                     PersonId = entity.PersonId,
                     StartDateTime = entity.StartDateTime,
                     EndDateTime = entity.EndDateTime,
+                    RowVersion = entity.RowVersion,
                 };
         }
 
@@ -119,6 +120,7 @@ namespace TimeTable.Application.Services
         {
             entity.StartDateTime = businessModel.StartDateTime;
             entity.EndDateTime = businessModel.EndDateTime;
+            entity.RowVersion = businessModel.RowVersion;
         }
 
         private async Task ValidateEntityToAddAsync(CreatingTimeRecord businessModel)

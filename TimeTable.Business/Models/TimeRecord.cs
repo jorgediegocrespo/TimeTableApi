@@ -9,6 +9,7 @@ namespace TimeTable.Business.Models
         public int PersonId { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
         public DateTimeOffset? EndDateTime { get; set; }
+        public byte[] RowVersion { get; set; }
     }
 
     public class CreatingTimeRecord
@@ -23,5 +24,8 @@ namespace TimeTable.Business.Models
     {
         [Required]
         public int Id { get; set; }
+
+        [Required]
+        public byte[] RowVersion { get; set; }
     }
 }

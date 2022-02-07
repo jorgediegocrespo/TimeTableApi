@@ -16,7 +16,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Exists_TrueWithLowerCase()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
@@ -30,7 +30,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Exists_TrueWithUpperCase()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" }); 
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
@@ -44,7 +44,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Exists_TrueWithSpaces()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
@@ -58,7 +58,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Exists_FalseWithName()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
@@ -72,7 +72,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Exists_FalseWithSameId()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddAsync(new PersonEntity { Id = 1, Name = "Person 1" });
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
@@ -86,7 +86,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task GetTotalRecords_Ok()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             await timeTableContext.People.AddRangeAsync(new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1" },
@@ -109,7 +109,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task GetAll_FirstPageOk()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1" },
@@ -136,7 +136,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task GetAll_SecondPageOk()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1" },
@@ -163,7 +163,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task GetAll_LastPageOk()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1" },
@@ -189,7 +189,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Get_ByIdOk()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1" },
@@ -213,7 +213,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Get_ByUserIdOk()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1", UserId = "User1" },
@@ -237,7 +237,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Add_Ok()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
@@ -251,7 +251,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Update_Ok()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1", UserId = "User1" },
@@ -281,7 +281,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Delete_Ok()
         {
-            TimeTableDbContext timeTableContext = GetTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
             var sourceList = new List<PersonEntity>
             {
                 new PersonEntity { Id = 1, Name = "Person 1", UserId = "User1" },
