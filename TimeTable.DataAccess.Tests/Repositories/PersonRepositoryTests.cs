@@ -269,8 +269,8 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
-            toUpdate.Name = "Updated";
-            await personRepository.UpdateAsync(toUpdate);
+            var entity = await personRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
+            entity.Name = "Updated";
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();
@@ -296,8 +296,11 @@ namespace TimeTable.DataAccess.Tests.Repositories
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
+            var toRemove = await timeTableContext.People.FirstOrDefaultAsync(x => x.Id == 4);
+            timeTableContext.ChangeTracker.Clear();
+
             PersonRepository personRepository = new PersonRepository(timeTableContext);
-            await personRepository.DeleteAsync(4);
+            await personRepository.DeleteAsync(toRemove.Id, toRemove.RowVersion);
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();

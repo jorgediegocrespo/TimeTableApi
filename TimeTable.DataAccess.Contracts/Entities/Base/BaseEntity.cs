@@ -8,7 +8,7 @@ namespace TimeTable.DataAccess.Contracts.Entities.Base
         public int Id { get; set; }
         public bool IsDeleted { get; set; }
 
-        [Timestamp, ConcurrencyCheck]
+        [Timestamp]
         public byte[] RowVersion { get; set; }
     }
 }

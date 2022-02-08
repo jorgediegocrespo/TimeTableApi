@@ -13,12 +13,20 @@ namespace TimeTable.DataAccess.Repositories
 
         protected override DbSet<CompanyEntity> DbEntity => dbContext.Companies;
 
-        public Task<CompanyEntity> GetAsync() => DbEntity.FirstOrDefaultAsync();
-
-        public Task UpdateAsync(CompanyEntity entity)
+        public async Task<CompanyEntity> GetAsync()
         {
-            DbEntity.Update(entity);
-            return Task.CompletedTask;
+            var result = await DbEntity.FirstOrDefaultAsync();
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
+
+        public Task<CompanyEntity> AttachAsync(int id, byte[] rowVersion)
+        {
+            var entity = new CompanyEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            return Task.FromResult(entity);
         }
     }
 }

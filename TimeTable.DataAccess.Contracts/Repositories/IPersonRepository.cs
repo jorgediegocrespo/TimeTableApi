@@ -12,7 +12,7 @@ namespace TimeTable.DataAccess.Contracts.Repositories
         Task<PersonEntity> GetAsync(int id);
         Task<PersonEntity> GetAsync(string userId);
         Task AddAsync(PersonEntity entity);
-        Task UpdateAsync(PersonEntity entity);
-        Task DeleteAsync(int id);
+        Task<PersonEntity> AttachAsync(int id, byte[] rowVersion);
+        Task DeleteAsync(int id, byte[] rowVersion);
     }
 }

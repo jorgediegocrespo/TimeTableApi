@@ -31,9 +31,11 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
-            CompanyEntity company = await timeTableContext.Companies.FirstOrDefaultAsync();
-            company.Name = "Changed name S.L.";
-            await companyRepository.UpdateAsync(company);
+            CompanyEntity toUpdate = await timeTableContext.Companies.FirstOrDefaultAsync();
+            timeTableContext.ChangeTracker.Clear();
+
+            var entityOne = await companyRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
+            entityOne.Name = "Changed name S.L.";
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();
@@ -49,26 +51,25 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
-            CompanyEntity companyOne = await timeTableContext.Companies.FirstOrDefaultAsync();
-            companyOne.Name = "Changed one S.L.";
+            CompanyEntity toUpdate = await timeTableContext.Companies.FirstOrDefaultAsync();
+            timeTableContext.ChangeTracker.Clear();
 
-            await companyRepository.UpdateAsync(companyOne);
+            var entityOne = await companyRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
+            entityOne.Name = "Changed one S.L.";
             await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
-            CompanyEntity companyTwo = await timeTableContext.Companies.FirstOrDefaultAsync();
-            companyTwo.Name = "Changed two S.L.";
+            var entityTwo = await companyRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
+            entityTwo.Name = "Changed two S.L.";
 
-            await companyRepository.UpdateAsync(companyTwo);
-            await timeTableContext.SaveChangesAsync();
-
-            //await Assert.ThrowsExceptionAsync<DbUpdateException>(result);
+            await Assert.ThrowsExceptionAsync<DbUpdateConcurrencyException>(() => timeTableContext.SaveChangesAsync());
             await timeTableContext.DisposeAsync();
         }
 
         private async Task AddCompanyAsync(TimeTableDbContext timeTableContext)
         {
             await timeTableContext.Companies.AddAsync(new CompanyEntity
-            {
+            { 
                 Name = "Test Company S.A.",
             });
             await timeTableContext.SaveChangesAsync();

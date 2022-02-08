@@ -76,27 +76,29 @@ namespace TimeTable.Application.Services
         {
             PersonEntity entity = await repository.GetAsync(businessModel.Id);
             await ValidateEntityToUpdateAsync(entity, businessModel);
-            MapUpdating(entity, businessModel);
-            await repository.UpdateAsync(entity);
+
+            PersonEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+            MapUpdating(entityToUpdate, businessModel);
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, byte[] rowVersion)
         {
             await unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 PersonEntity person = await repository.GetAsync(id);
                 ValidateEntityToDelete(person, id);
-                await repository.DeleteAsync(id);
+
+                await repository.DeleteAsync(id, rowVersion);
                 await unitOfWork.SaveChangesAsync();
                 await userService.DeleteAsync(person.UserId);
             });
         }
 
-        public async Task DeleteOwnAsync()
+        public async Task DeleteOwnAsync(byte[] rowVersion)
         {
             int? id = await userService.GetContextPersonIdAsync();
-            await DeleteAsync(id.Value);
+            await DeleteAsync(id.Value, rowVersion);
         }
 
         private ReadingPerson MapReading(PersonEntity entity)

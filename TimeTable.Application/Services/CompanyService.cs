@@ -34,9 +34,9 @@ namespace TimeTable.Application.Services
         {
             CompanyEntity entity = await repository.GetAsync();
             ValidateEntityToUpdate(entity, businessModel);
-            MapUpdating(entity, businessModel);
 
-            await repository.UpdateAsync(entity);
+            CompanyEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+            MapUpdating(entityToUpdate, businessModel);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -53,7 +53,6 @@ namespace TimeTable.Application.Services
         private void MapUpdating(CompanyEntity entity, Company businessModel)
         {
             entity.Name = businessModel.Name;
-            entity.RowVersion = businessModel.RowVersion;
         }
 
         private void ValidateEntityToUpdate(CompanyEntity entity, Company businessModel)

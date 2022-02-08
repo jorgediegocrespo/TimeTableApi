@@ -105,9 +105,9 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, byte[] rowVersion)
         {
-            await service.DeleteAsync(id);
+            await service.DeleteAsync(id, rowVersion);
             return NoContent();
         }
 
@@ -116,9 +116,9 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteOwn()
+        public async Task<IActionResult> DeleteOwn(byte[] rowVersion)
         {
-            await service.DeleteOwnAsync();
+            await service.DeleteOwnAsync(rowVersion);
             return NoContent();
         }
     }

@@ -361,9 +361,9 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             TimeRecordRepository timeRecordRepository = new TimeRecordRepository(timeTableContext);
+            var entity = await timeRecordRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
             var newEndDateTime = new DateTimeOffset(2022, 1, 4, 15, 0, 0, TimeSpan.FromHours(0));
-            toUpdate.EndDateTime = newEndDateTime;
-            await timeRecordRepository.UpdateAsync(toUpdate);
+            entity.EndDateTime = newEndDateTime;
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();
@@ -389,8 +389,11 @@ namespace TimeTable.DataAccess.Tests.Repositories
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
+            var toRemove = await timeTableContext.TimeRecords.FirstOrDefaultAsync(x => x.Id == 4);
+            timeTableContext.ChangeTracker.Clear();
+
             TimeRecordRepository timeRecordRepository = new TimeRecordRepository(timeTableContext);
-            await timeRecordRepository.DeleteAsync(4);
+            await timeRecordRepository.DeleteAsync(toRemove.Id, toRemove.RowVersion);
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();

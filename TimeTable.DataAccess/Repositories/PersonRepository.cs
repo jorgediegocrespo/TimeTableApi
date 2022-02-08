@@ -24,28 +24,50 @@ namespace TimeTable.DataAccess.Repositories
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
 
-        public async Task<IEnumerable<PersonEntity>> GetAllAsync(int pageSize, int pageNumber) => 
-            await DbEntity.OrderBy(x => x.Name).Paginate(pageSize, pageNumber).ToListAsync();
+        public async Task<IEnumerable<PersonEntity>> GetAllAsync(int pageSize, int pageNumber)
+        {
+            var result = await DbEntity.OrderBy(x => x.Name).Paginate(pageSize, pageNumber).ToListAsync();
+            dbContext.ChangeTracker.Clear();
 
-        public async Task<PersonEntity> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
-        
-        public async Task<PersonEntity> GetAsync(string userId) => await DbEntity.FirstOrDefaultAsync(x => x.UserId == userId);
+            return result;
+        }
+
+        public async Task<PersonEntity> GetAsync(int id)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
+
+        public async Task<PersonEntity> GetAsync(string userId)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.UserId == userId);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
         
         public async Task AddAsync(PersonEntity entity)
         {
             await DbEntity.AddAsync(entity);
         }
 
-        public Task UpdateAsync(PersonEntity entity)
+        public Task<PersonEntity> AttachAsync(int id, byte[] rowVersion)
         {
-            DbEntity.Update(entity);
-            return Task.CompletedTask;
+            PersonEntity entity = new PersonEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            return Task.FromResult(entity);
         }
 
-        public async Task DeleteAsync(int id)
+        public Task DeleteAsync(int id, byte[] rowVersion)
         {
-            var entityToRemove = await DbEntity.SingleAsync(x => x.Id == id);
-            DbEntity.Remove(entityToRemove);
+            PersonEntity entity = new PersonEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            DbEntity.Remove(entity);
+            return Task.CompletedTask;
         }
     }
 }

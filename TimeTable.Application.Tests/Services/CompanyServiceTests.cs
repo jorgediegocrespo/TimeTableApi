@@ -44,13 +44,14 @@ namespace TimeTable.Application.Tests.Services
         {
             CompanyEntity givenCompany = GivenCompany();
             companyRepositoryMock.Setup(x => x.GetAsync()).ReturnsAsync(givenCompany);
-            companyRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<CompanyEntity>())).Returns(Task.CompletedTask);
+            companyRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new CompanyEntity { Id = givenCompany.Id, RowVersion = givenCompany.RowVersion });
 
             CompanyService companyService = new CompanyService(unitOfWorkMock.Object, companyRepositoryMock.Object, appConfigMock.Object);
             Company company = new Company()
             {
                 Id = 2,
-                Name = "New company"
+                Name = "New company",
+                RowVersion = givenCompany.RowVersion,
             };
 
             await Assert.ThrowsExceptionAsync<NotValidOperationException>(() => companyService.UpdateAsync(company), ErrorCodes.ITEM_NOT_EXISTS);
@@ -61,13 +62,14 @@ namespace TimeTable.Application.Tests.Services
         {
             CompanyEntity givenCompany = GivenCompany();
             companyRepositoryMock.Setup(x => x.GetAsync()).ReturnsAsync(givenCompany);
-            companyRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<CompanyEntity>())).Returns(Task.CompletedTask);
+            companyRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new CompanyEntity { Id = givenCompany.Id, RowVersion = givenCompany.RowVersion });
 
             CompanyService companyService = new CompanyService(unitOfWorkMock.Object, companyRepositoryMock.Object, appConfigMock.Object);
             Company company = new Company()
             {
                 Id = 1,
-                Name = "New company"
+                Name = "New company",
+                RowVersion = givenCompany.RowVersion,
             };
             Task result = companyService.UpdateAsync(company);
 

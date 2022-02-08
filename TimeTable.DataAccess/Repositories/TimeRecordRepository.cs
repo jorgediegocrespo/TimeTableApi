@@ -29,31 +29,58 @@ namespace TimeTable.DataAccess.Repositories
 
         public async Task<int> GetTotalRecordsAsync(int personId) => await DbEntity.CountAsync(x => x.PersonId == personId);
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber) => 
-            await DbEntity.OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber)
+        {
+            var result = await DbEntity.OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            dbContext.ChangeTracker.Clear();
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId, int pageSize, int pageNumber) => 
-            await DbEntity.Where(x => x.PersonId == personId).OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            return result;
+        }
 
-        public async Task<TimeRecordEntity> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId, int pageSize, int pageNumber)
+        {
+            var result = await DbEntity.Where(x => x.PersonId == personId).OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            dbContext.ChangeTracker.Clear();
 
-        public async Task<TimeRecordEntity> GetAsync(int id, int personId) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id && x.PersonId == personId);
+            return result;
+        }
+
+        public async Task<TimeRecordEntity> GetAsync(int id)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
+
+        public async Task<TimeRecordEntity> GetAsync(int id, int personId)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.Id == id && x.PersonId == personId);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
 
         public async Task AddAsync(TimeRecordEntity entity)
         {
             await DbEntity.AddAsync(entity);
         }
 
-        public Task UpdateAsync(TimeRecordEntity entity)
+        public Task<TimeRecordEntity> AttachAsync(int id, byte[] rowVersion)
         {
-            DbEntity.Update(entity);
-            return Task.CompletedTask;
+            var entity = new TimeRecordEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            return Task.FromResult(entity);
         }
 
-        public async Task DeleteAsync(int id)
+        public Task DeleteAsync(int id, byte[] rowVersion)
         {
-            var entityToRemove = await DbEntity.SingleAsync(x => x.Id == id);
-            DbEntity.Remove(entityToRemove);
+            TimeRecordEntity entity = new TimeRecordEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            DbEntity.Remove(entity);
+            return Task.CompletedTask;
         }
     }
 }

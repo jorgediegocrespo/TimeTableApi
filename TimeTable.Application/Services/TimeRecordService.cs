@@ -79,16 +79,18 @@ namespace TimeTable.Application.Services
         {
             TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
             await ValidateEntityToUpdateAsync(entity, businessModel);
-            MapUpdating(entity, businessModel);
-            await repository.UpdateAsync(entity);
+
+            TimeRecordEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+            MapUpdating(entityToUpdate, businessModel);
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, byte[] rowVersion)
         {
             TimeRecordEntity entity = await repository.GetAsync(id);
             await ValidateEntityToDeleteAsync(entity);
-            await repository.DeleteAsync(id);
+
+            await repository.DeleteAsync(id, rowVersion);
             await unitOfWork.SaveChangesAsync();
         }
 
