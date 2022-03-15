@@ -61,13 +61,9 @@ namespace TimeTable.DataAccess.Repositories
             return Task.FromResult(entity);
         }
 
-        public Task DeleteAsync(int id, byte[] rowVersion)
+        public async Task DeleteAsync(int id, byte[] rowVersion)
         {
-            PersonEntity entity = new PersonEntity { Id = id, RowVersion = rowVersion };
-            DbEntity.Attach(entity);
-
-            DbEntity.Remove(entity);
-            return Task.CompletedTask;
+            await DbEntity.RemoveConcurrently(id, rowVersion);
         }
     }
 }

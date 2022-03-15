@@ -17,12 +17,12 @@ namespace TimeTable.DataAccess.Repositories
 
         protected override DbSet<TimeRecordEntity> DbEntity => dbContext.TimeRecords;
 
-        public async Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime) =>
+        public async Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime) => //TODO Include personId
             await DbEntity.Where(x =>
                 x.Id != id &&
-                x.StartDateTime.UtcDateTime <= dateTime.UtcDateTime &&
+                DateTimeOffset.Compare(x.StartDateTime, dateTime) <= 0 &&
                 x.EndDateTime.HasValue &&
-                x.EndDateTime.Value.UtcDateTime >= dateTime.UtcDateTime)
+                DateTimeOffset.Compare(x.EndDateTime.Value, dateTime) >= 0)
             .AnyAsync();
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
@@ -74,13 +74,9 @@ namespace TimeTable.DataAccess.Repositories
             return Task.FromResult(entity);
         }
 
-        public Task DeleteAsync(int id, byte[] rowVersion)
+        public async Task DeleteAsync(int id, byte[] rowVersion)
         {
-            TimeRecordEntity entity = new TimeRecordEntity { Id = id, RowVersion = rowVersion };
-            DbEntity.Attach(entity);
-
-            DbEntity.Remove(entity);
-            return Task.CompletedTask;
+            await DbEntity.RemoveConcurrently(id, rowVersion);
         }
     }
 }

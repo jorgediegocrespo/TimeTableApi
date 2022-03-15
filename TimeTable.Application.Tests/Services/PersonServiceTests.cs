@@ -219,7 +219,7 @@ namespace TimeTable.Application.Tests.Services
             userServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            await personService.DeleteAsync(givenPerson.Id, givenPerson.RowVersion);
+            await personService.DeleteAsync(new DeleteRequest { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
             Assert.AreEqual(null, resultException);
         }
@@ -241,7 +241,7 @@ namespace TimeTable.Application.Tests.Services
             userServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            await personService.DeleteAsync(givenPerson.Id, givenPerson.RowVersion);
+            await personService.DeleteAsync(new DeleteRequest { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
             Assert.IsInstanceOfType(resultException, typeof(NotValidOperationException));
             Assert.AreEqual(ErrorCodes.PERSON_DEFAULT, resultException.Message);

@@ -82,23 +82,23 @@ namespace TimeTable.Application.Services
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id, byte[] rowVersion)
+        public async Task DeleteAsync(DeleteRequest deleteRequest)
         {
             await unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                PersonEntity person = await repository.GetAsync(id);
-                ValidateEntityToDelete(person, id);
+                PersonEntity person = await repository.GetAsync(deleteRequest.Id);
+                ValidateEntityToDelete(person);
 
-                await repository.DeleteAsync(id, rowVersion);
+                await repository.DeleteAsync(deleteRequest.Id, deleteRequest.RowVersion);
                 await unitOfWork.SaveChangesAsync();
                 await userService.DeleteAsync(person.UserId);
             });
         }
 
-        public async Task DeleteOwnAsync(byte[] rowVersion)
+        public async Task DeleteOwnAsync(DeleteOwnRequest deleteRequest)
         {
             int? id = await userService.GetContextPersonIdAsync();
-            await DeleteAsync(id.Value, rowVersion);
+            await DeleteAsync(new DeleteRequest { Id = id.Value, RowVersion = deleteRequest.RowVersion });
         }
 
         private ReadingPerson MapReading(PersonEntity entity)
@@ -148,8 +148,11 @@ namespace TimeTable.Application.Services
                 throw new ForbidenActionException();
         }
 
-        private void ValidateEntityToDelete(PersonEntity person, int id)
+        private void ValidateEntityToDelete(PersonEntity person)
         {
+            if (person == null)
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There persont to remove does not exits");
+
             if (person.IsDefault)
                 throw new NotValidOperationException(ErrorCodes.PERSON_DEFAULT, $"A default person could not be removed");
         }

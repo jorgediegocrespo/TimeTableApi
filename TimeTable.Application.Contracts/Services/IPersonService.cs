@@ -11,7 +11,7 @@ namespace TimeTable.Application.Contracts.Services
         Task<ReadingPerson> GetOwnAsync();
         Task<int> AddAsync(CreatingPerson businessModel);
         Task UpdateAsync(UpdatingPerson businessModel);
-        Task DeleteAsync(int id, byte[] rowVersion);
-        Task DeleteOwnAsync(byte[] rowVersion);
+        Task DeleteAsync(DeleteRequest deleteRequest);
+        Task DeleteOwnAsync(DeleteOwnRequest deleteRequest);
     }
 }

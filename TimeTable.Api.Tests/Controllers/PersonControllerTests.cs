@@ -227,7 +227,7 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
-            UpdatingPerson updatingPerson = new UpdatingPerson { Id = Constants.EmployeeId, Name = "Employee updated" };
+            UpdatingPerson updatingPerson = new UpdatingPerson { Id = PeopleInfo.EmployeeId, Name = "Employee updated" };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingPerson), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
 
@@ -252,7 +252,7 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
 
-            UpdatingPerson updatingPerson = new UpdatingPerson { Id = Constants.EmployeeId, Name = "123" };
+            UpdatingPerson updatingPerson = new UpdatingPerson { Id = PeopleInfo.EmployeeId, Name = "123" };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingPerson), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
 
@@ -265,7 +265,7 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
 
-            UpdatingPerson updatingPerson = new UpdatingPerson { Id = 10, Name = "Test-Updated" };
+            UpdatingPerson updatingPerson = new UpdatingPerson { Id = PeopleInfo.EmployeeId, Name = "Test-Updated", RowVersion = PeopleInfo.EmployeeRowVersion };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingPerson), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
 
@@ -278,7 +278,7 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             
-            UpdatingPerson updatingPerson = new UpdatingPerson { Id = Constants.EmployeeId, Name = "Employee updated" };
+            UpdatingPerson updatingPerson = new UpdatingPerson { Id = PeopleInfo.EmployeeId, Name = "Employee updated", RowVersion = PeopleInfo.EmployeeRowVersion };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingPerson), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
 
@@ -291,7 +291,12 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/2");
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
+            DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.AdminId, RowVersion = rndRowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -302,7 +307,13 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/1");
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
+            DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.AdminId, RowVersion = rndRowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
+
             CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.Conflict, response.StatusCode);
@@ -316,9 +327,11 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await AddTestPerson(factory, timeTableContext);
+            var person = await AddTestPerson(factory, timeTableContext);
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/10");
+            DeleteRequest deleteRequest = new DeleteRequest { Id = person.Id, RowVersion = person.RowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.NoContent, response.StatusCode);
         }
@@ -329,7 +342,13 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
             HttpClient client = factory.CreateClient();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/own");
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
+            DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.EmployeeId, RowVersion = rndRowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/deleteOwn", content);
+            CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -340,7 +359,12 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
             HttpClient client = factory.CreateClient();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/own");
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
+            DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.AdminId, RowVersion = rndRowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/deleteOwn", content);
             CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.Conflict, response.StatusCode);
@@ -353,12 +377,15 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/own");
+            DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.EmployeeId, RowVersion = PeopleInfo.EmployeeRowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/deleteOwn", content);
+            CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.NoContent, response.StatusCode);
         }
 
-        private async Task AddTestPerson(WebApplicationFactory<Startup> factory, TimeTableDbContext context)
+        private async Task<PersonEntity> AddTestPerson(WebApplicationFactory<Startup> factory, TimeTableDbContext context)
         {
             using (var scope = factory.Services.CreateScope())
             {
@@ -367,7 +394,6 @@ namespace TimeTable.Api.Tests.Controllers
                 
                 IdentityUser user = new IdentityUser
                 {
-                    Id = "76d0f070-2654-4279-af41-6b29739c5942",
                     UserName = "Test",
                     Email = "test@test.com",
                 };
@@ -376,10 +402,13 @@ namespace TimeTable.Api.Tests.Controllers
                 await userManager.AddToRoleAsync(user, RolesConsts.EMPLOYEE);
 
                 string userId = await userManager.GetUserIdAsync(user);
-                await context.People.AddAsync(new PersonEntity() { Id = 10, Name = "Test", UserId = userId, IsDefault = false });
+                var person = new PersonEntity() { Name = "Test", UserId = userId, IsDefault = false };
+                await context.People.AddAsync(person);
 
                 await context.SaveChangesAsync();
                 context.ChangeTracker.Clear();
+
+                return person;
             }
         }
     }

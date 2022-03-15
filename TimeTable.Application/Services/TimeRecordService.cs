@@ -85,12 +85,12 @@ namespace TimeTable.Application.Services
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id, byte[] rowVersion)
+        public async Task DeleteAsync(DeleteRequest deleteRequest)
         {
-            TimeRecordEntity entity = await repository.GetAsync(id);
+            TimeRecordEntity entity = await repository.GetAsync(deleteRequest.Id);
             await ValidateEntityToDeleteAsync(entity);
 
-            await repository.DeleteAsync(id, rowVersion);
+            await repository.DeleteAsync(deleteRequest.Id, deleteRequest.RowVersion);
             await unitOfWork.SaveChangesAsync();
         }
 

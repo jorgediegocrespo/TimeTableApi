@@ -14,7 +14,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Get_OK()
         {
-            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = await GetLocalDbTimeTableContext(Guid.NewGuid().ToString());
             await AddCompanyAsync(timeTableContext);
 
             CompanyRepository companyRepository = new CompanyRepository(timeTableContext);
@@ -26,7 +26,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
         [TestMethod]
         public async Task Update_OK()
         {
-            TimeTableDbContext timeTableContext = GetInMemoryTimeTableDbContext(Guid.NewGuid().ToString());
+            TimeTableDbContext timeTableContext = await GetLocalDbTimeTableContext(Guid.NewGuid().ToString());
             await AddCompanyAsync(timeTableContext);
             timeTableContext.ChangeTracker.Clear();
 

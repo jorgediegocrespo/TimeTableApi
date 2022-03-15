@@ -455,17 +455,19 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
+            var timeRecord = new TimeRecordEntity()
             {
-                Id = 1,
-                PersonId = 1,
+                PersonId = PeopleInfo.AdminId,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
                 EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
-            });
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord);
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/1");
+            DeleteRequest deleteRequest = new DeleteRequest { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
             CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.Forbidden, response.StatusCode);

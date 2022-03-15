@@ -302,7 +302,7 @@ namespace TimeTable.Application.Tests.Services
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
             TimeRecordService timeRecordService = new TimeRecordService(unitOfWorkMock.Object, timeRecordRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            Task result = timeRecordService.DeleteAsync(givenTimeRecord.Id, givenTimeRecord.RowVersion);
+            Task result = timeRecordService.DeleteAsync(new DeleteRequest { Id = givenTimeRecord.Id, RowVersion = givenTimeRecord.RowVersion });
             
             Assert.AreEqual(Task.CompletedTask, result);
         }
@@ -320,7 +320,7 @@ namespace TimeTable.Application.Tests.Services
 
             TimeRecordService timeRecordService = new TimeRecordService(unitOfWorkMock.Object, timeRecordRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
 
-            await Assert.ThrowsExceptionAsync<ForbidenActionException>(() => timeRecordService.DeleteAsync(givenTimeRecord.Id, givenTimeRecord.RowVersion));
+            await Assert.ThrowsExceptionAsync<ForbidenActionException>(() => timeRecordService.DeleteAsync(new DeleteRequest { Id = givenTimeRecord.Id, RowVersion = givenTimeRecord.RowVersion }));
         }
 
         private List<TimeRecordEntity> GivenTimeRecordList(int count)
