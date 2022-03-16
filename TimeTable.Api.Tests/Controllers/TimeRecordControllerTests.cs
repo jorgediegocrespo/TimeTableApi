@@ -208,7 +208,7 @@ namespace TimeTable.Api.Tests.Controllers
             HttpClient client = factory.CreateClient();
             await AddTestTimeRecordsAsync(dbContextName);
 
-            HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/2");
+            HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/1");
 
             Assert.AreEqual(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -234,7 +234,7 @@ namespace TimeTable.Api.Tests.Controllers
             HttpClient client = factory.CreateClient();
             await AddTestTimeRecordsAsync(dbContextName);
 
-            HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/1");
+            HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/2");
 
             Assert.AreEqual(System.Net.HttpStatusCode.OK, response.StatusCode);
         }
@@ -277,8 +277,7 @@ namespace TimeTable.Api.Tests.Controllers
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
             {
-                Id = 1,
-                PersonId = 2,
+                PersonId = PeopleInfo.EmployeeId,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
                 EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
             });
@@ -347,21 +346,22 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
+            var timeRecord = new TimeRecordEntity()
             {
-                Id = 1,
-                PersonId = 1,
+                PersonId = PeopleInfo.AdminId,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
                 EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
-            });
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord);
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
             UpdatingTimeRecord updatingTimeRecord = new UpdatingTimeRecord
             {
-                Id = 1,
+                Id = timeRecord.Id,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 9, 0, 0)),
-                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 14, 0, 0))
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 14, 0, 0)),
+                RowVersion = timeRecord.RowVersion
             };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingTimeRecord), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
@@ -376,31 +376,29 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await timeTableContext.TimeRecords.AddRangeAsync(new List<TimeRecordEntity>
-            { 
-                new TimeRecordEntity()
-                {
-                    Id = 1,
-                    PersonId = 2,
-                    StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
-                    EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
-                },
-                new TimeRecordEntity()
-                {
-                    Id = 2,
-                    PersonId = 2,
-                    StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 8, 0, 0)),
-                    EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 15, 0, 0))
-                }
-            });
+            var timeRecord1 = new TimeRecordEntity()
+            {
+                PersonId = PeopleInfo.EmployeeId,
+                StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
+            };
+            var timeRecord2 = new TimeRecordEntity()
+            {
+                PersonId = PeopleInfo.EmployeeId,
+                StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 8, 0, 0)),
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 15, 0, 0))
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord1);
+            await timeTableContext.TimeRecords.AddAsync(timeRecord2);
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
             UpdatingTimeRecord updatingTimeRecord = new UpdatingTimeRecord
             {
-                Id = 1,
+                Id = timeRecord1.Id,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 9, 0, 0)),
-                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 14, 0, 0))
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 2, 14, 0, 0)),
+                RowVersion = timeRecord1.RowVersion,
             };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingTimeRecord), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
@@ -415,21 +413,22 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
+            var timeRecord1 = new TimeRecordEntity()
             {
-                Id = 1,
-                PersonId = 2,
+                PersonId = PeopleInfo.EmployeeId,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
                 EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
-            });
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord1);
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
             UpdatingTimeRecord updatingTimeRecord = new UpdatingTimeRecord
             {
-                Id = 1,
+                Id = timeRecord1.Id,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 9, 0, 0)),
-                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 16, 0, 0))
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 16, 0, 0)),
+                RowVersion = timeRecord1.RowVersion
             };
             StringContent content = new StringContent(JsonConvert.SerializeObject(updatingTimeRecord), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
@@ -440,10 +439,23 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Delete_Unauthorized()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            string dbContextName = Guid.NewGuid().ToString();
+            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, null);
             HttpClient client = factory.CreateClient();
+            TimeTableDbContext timeTableContext = BuildContext(dbContextName);
+            var timeRecord = new TimeRecordEntity()
+            {
+                PersonId = PeopleInfo.EmployeeId,
+                StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
+                EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord);
+            await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/1");
+            DeleteRequest deleteRequest = new DeleteRequest { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -468,7 +480,6 @@ namespace TimeTable.Api.Tests.Controllers
             DeleteRequest deleteRequest = new DeleteRequest { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion };
             StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
-            CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
 
             Assert.AreEqual(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -480,18 +491,19 @@ namespace TimeTable.Api.Tests.Controllers
             WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
             HttpClient client = factory.CreateClient();
             TimeTableDbContext timeTableContext = BuildContext(dbContextName);
-            await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
+            var timeRecord = new TimeRecordEntity()
             {
-                Id = 1,
-                PersonId = 2,
+                PersonId = PeopleInfo.EmployeeId,
                 StartDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 8, 0, 0)),
                 EndDateTime = new DateTimeOffset(new DateTime(2022, 1, 1, 15, 0, 0))
-            });
+            };
+            await timeTableContext.TimeRecords.AddAsync(timeRecord);
             await timeTableContext.SaveChangesAsync();
             timeTableContext.ChangeTracker.Clear();
 
-            HttpResponseMessage response = await client.DeleteAsync($"{url}/1");
-            CustomError result = JsonConvert.DeserializeObject<CustomError>(await response.Content.ReadAsStringAsync());
+            DeleteRequest deleteRequest = new DeleteRequest { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"{url}/delete", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.NoContent, response.StatusCode);
         }
@@ -504,8 +516,7 @@ namespace TimeTable.Api.Tests.Controllers
             {
                 await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
                 {
-                    Id = i,
-                    PersonId = (i % 2) + 1,
+                    PersonId = (i % 2) == 0 ? PeopleInfo.EmployeeId : PeopleInfo.AdminId,
                     StartDateTime = new DateTimeOffset(new DateTime(2022,1,i,8,0,0)),
                     EndDateTime = new DateTimeOffset(new DateTime(2022, 1, i, 15, 0, 0))
                 });
