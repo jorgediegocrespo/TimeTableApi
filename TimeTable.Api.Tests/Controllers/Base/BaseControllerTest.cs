@@ -19,7 +19,11 @@ namespace TimeTable.Api.Tests.Controllers.Base
     {
         protected TimeTableDbContext BuildContext(string dbContextName)
         {
-            DbContextOptions<TimeTableDbContext> options = new DbContextOptionsBuilder<TimeTableDbContext>().UseInMemoryDatabase(dbContextName).ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
+            string connectionString = $"Server=(localdb)\\mssqllocaldb;Database={dbContextName};Integrated Security=true";
+            DbContextOptions<TimeTableDbContext> options = new DbContextOptionsBuilder<TimeTableDbContext>()
+                .UseSqlServer(connectionString, options => options.UseNetTopologySuite())
+                .Options;
+
             return new TimeTableDbContext(options);
         }
 
@@ -34,8 +38,9 @@ namespace TimeTable.Api.Tests.Controllers.Base
                     if (descriptorDbContext != null)
                         services.Remove(descriptorDbContext);
 
+                    string connectionString = $"Server=(localdb)\\mssqllocaldb;Database={dbContextName};Integrated Security=true";
                     services.AddDbContext<TimeTableDbContext>(options => options
-                        .UseInMemoryDatabase(dbContextName)
+                        .UseSqlServer(connectionString, options => options.UseNetTopologySuite())
                         .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
 
                     services.AddSingleton<IAuthorizationHandler>(x => new ManageRoleAccessHandler(userRole));
@@ -64,6 +69,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
             UserManager<IdentityUser> userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
             RoleManager<IdentityRole> rolesManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
 
+            await context.Database.EnsureCreatedAsync();
             await AddDefaultCompany(context);
             await AddDefaultRoles(rolesManager, context);
             await AddAdminPerson(userManager, context);
@@ -92,7 +98,6 @@ namespace TimeTable.Api.Tests.Controllers.Base
         {
             IdentityUser user = new IdentityUser
             {
-                Id = Constants.AdminNameIdentifier,
                 UserName = Constants.AdminName,
                 Email = Constants.AdminEmail,
             };
@@ -101,16 +106,20 @@ namespace TimeTable.Api.Tests.Controllers.Base
             await userManager.AddToRoleAsync(user, RolesConsts.ADMIN);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = Constants.AdminId, Name = Constants.AdminName, UserId = userId, IsDefault = true });            
+            var person = new PersonEntity() { Name = Constants.AdminName, UserId = userId, IsDefault = true };
+            await context.People.AddAsync(person);            
 
             await context.SaveChangesAsync();
+
+            PeopleInfo.AdminId = person.Id;
+            PeopleInfo.AdminNameIdentifier = userId;
+            PeopleInfo.AdminRowVersion = person.RowVersion;
         }
 
         private async Task AddEmployeePerson(UserManager<IdentityUser> userManager, TimeTableDbContext context)
         {
             IdentityUser user = new IdentityUser
             {
-                Id = Constants.EmployeeNameIdentifier,
                 UserName = Constants.EmployeeName,
                 Email = Constants.EmployeeEmail,
             };
@@ -119,9 +128,14 @@ namespace TimeTable.Api.Tests.Controllers.Base
             await userManager.AddToRoleAsync(user, RolesConsts.EMPLOYEE);
 
             string userId = await userManager.GetUserIdAsync(user);
-            await context.People.AddAsync(new PersonEntity() { Id = Constants.EmployeeId, Name = Constants.EmployeePassword, UserId = userId, IsDefault = false });
+            var person = new PersonEntity() { Name = Constants.EmployeePassword, UserId = userId, IsDefault = false };
+            await context.People.AddAsync(person);
             
             await context.SaveChangesAsync();
+
+            PeopleInfo.EmployeeId = person.Id;
+            PeopleInfo.EmployeeNameIdentifier = userId;
+            PeopleInfo.EmployeeRowVersion = person.RowVersion;
         }
     }
 }

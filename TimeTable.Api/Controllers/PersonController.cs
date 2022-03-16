@@ -99,26 +99,26 @@ namespace TimeTable.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpPut]
+        [Route("delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromBody] DeleteRequest deleteRequest)
         {
-            await service.DeleteAsync(id);
+            await service.DeleteAsync(deleteRequest);
             return NoContent();
         }
 
-        [HttpDelete]
-        [Route("own")]
+        [HttpPut]
+        [Route("deleteOwn")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteOwn()
+        public async Task<IActionResult> DeleteOwn([FromBody] DeleteOwnRequest deleteRequest)
         {
-            await service.DeleteOwnAsync();
+            await service.DeleteOwnAsync(deleteRequest);
             return NoContent();
         }
     }

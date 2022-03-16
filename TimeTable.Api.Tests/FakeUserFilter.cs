@@ -22,7 +22,7 @@ namespace TimeTable.Api.Tests
                 case RolesConsts.ADMIN:
                     context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                     {
-                        new Claim(ClaimTypes.NameIdentifier, Constants.AdminNameIdentifier),
+                        new Claim(ClaimTypes.NameIdentifier, PeopleInfo.AdminNameIdentifier),
                         new Claim(ClaimTypes.Name, Constants.AdminName),
                         new Claim(ClaimTypes.Email, Constants.AdminEmail),
                     }, "fakeAdminTest"));
@@ -30,7 +30,7 @@ namespace TimeTable.Api.Tests
                 case RolesConsts.EMPLOYEE:
                     context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                     {
-                        new Claim(ClaimTypes.NameIdentifier, Constants.EmployeeNameIdentifier),
+                        new Claim(ClaimTypes.NameIdentifier, PeopleInfo.EmployeeNameIdentifier),
                         new Claim(ClaimTypes.Name, Constants.EmployeeName),
                         new Claim(ClaimTypes.Email, Constants.EmployeeEmail),
                     }, "fakeEmployeeTest"));

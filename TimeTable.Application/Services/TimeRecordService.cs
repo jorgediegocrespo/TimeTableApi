@@ -79,16 +79,18 @@ namespace TimeTable.Application.Services
         {
             TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
             await ValidateEntityToUpdateAsync(entity, businessModel);
-            MapUpdating(entity, businessModel);
-            await repository.UpdateAsync(entity);
+
+            TimeRecordEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+            MapUpdating(entityToUpdate, businessModel);
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(DeleteRequest deleteRequest)
         {
-            TimeRecordEntity entity = await repository.GetAsync(id);
+            TimeRecordEntity entity = await repository.GetAsync(deleteRequest.Id);
             await ValidateEntityToDeleteAsync(entity);
-            await repository.DeleteAsync(id);
+
+            await repository.DeleteAsync(deleteRequest.Id, deleteRequest.RowVersion);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -102,6 +104,7 @@ namespace TimeTable.Application.Services
                     PersonId = entity.PersonId,
                     StartDateTime = entity.StartDateTime,
                     EndDateTime = entity.EndDateTime,
+                    RowVersion = entity.RowVersion,
                 };
         }
 
@@ -119,6 +122,7 @@ namespace TimeTable.Application.Services
         {
             entity.StartDateTime = businessModel.StartDateTime;
             entity.EndDateTime = businessModel.EndDateTime;
+            entity.RowVersion = businessModel.RowVersion;
         }
 
         private async Task ValidateEntityToAddAsync(CreatingTimeRecord businessModel)

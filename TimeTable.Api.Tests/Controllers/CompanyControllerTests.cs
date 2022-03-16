@@ -128,7 +128,7 @@ namespace TimeTable.Api.Tests.Controllers
             CompanyEntity companyEntity = timeTableContext.Companies.First();
             timeTableContext.ChangeTracker.Clear();
 
-            Company companyToUpdate = new Company { Id = companyEntity.Id, Name = "Company Updated" };
+            Company companyToUpdate = new Company { Id = companyEntity.Id, Name = "Company Updated", RowVersion = companyEntity.RowVersion };
             StringContent content = new StringContent(JsonConvert.SerializeObject(companyToUpdate), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PutAsync(url, content);
             

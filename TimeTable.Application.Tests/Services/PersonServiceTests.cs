@@ -141,13 +141,14 @@ namespace TimeTable.Application.Tests.Services
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
             personRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(givenPerson);
             personRepositoryMock.Setup(x => x.ExistsAsync(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(false);
-            personRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<PersonEntity>())).Returns(Task.CompletedTask);
+            personRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new PersonEntity { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion});
 
 
             UpdatingPerson person = new UpdatingPerson()
             {
                 Id = personId,
-                Name = "Person updated"
+                Name = "Person updated",
+                RowVersion = givenPerson.RowVersion
             };
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
             Task result = personService.UpdateAsync(person);
@@ -164,13 +165,14 @@ namespace TimeTable.Application.Tests.Services
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
             personRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(givenPerson);
             personRepositoryMock.Setup(x => x.ExistsAsync(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(true);
-            personRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<PersonEntity>())).Returns(Task.CompletedTask);
+            personRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new PersonEntity { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
 
             UpdatingPerson person = new UpdatingPerson()
             {
                 Id = personId,
-                Name = "Person updated"
+                Name = "Person updated",
+                RowVersion = givenPerson.RowVersion
             };
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
             
@@ -186,13 +188,14 @@ namespace TimeTable.Application.Tests.Services
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(1);
             personRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(givenPerson);
             personRepositoryMock.Setup(x => x.ExistsAsync(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(false);
-            personRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<PersonEntity>())).Returns(Task.CompletedTask);
+            personRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new PersonEntity { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
 
             UpdatingPerson person = new UpdatingPerson()
             {
                 Id = personId,
-                Name = "Person updated"
+                Name = "Person updated",
+                RowVersion = givenPerson.RowVersion,
             };
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
 
@@ -211,12 +214,12 @@ namespace TimeTable.Application.Tests.Services
             int personId = 2;
             PersonEntity givenPerson = GivenNonDefaultPerson(personId);
             personRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(givenPerson);
-            personRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
+            personRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<byte[]>())).Returns(Task.CompletedTask);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
             userServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            await personService.DeleteAsync(personId);
+            await personService.DeleteAsync(new DeleteRequest { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
             Assert.AreEqual(null, resultException);
         }
@@ -233,12 +236,12 @@ namespace TimeTable.Application.Tests.Services
             int personId = 2;
             PersonEntity givenPerson = GivenDefaultPerson(personId);
             personRepositoryMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(givenPerson);
-            personRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
+            personRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<byte[]>())).Returns(Task.CompletedTask);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
             userServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             PersonService personService = new PersonService(unitOfWorkMock.Object, personRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            await personService.DeleteAsync(personId);
+            await personService.DeleteAsync(new DeleteRequest { Id = givenPerson.Id, RowVersion = givenPerson.RowVersion });
 
             Assert.IsInstanceOfType(resultException, typeof(NotValidOperationException));
             Assert.AreEqual(ErrorCodes.PERSON_DEFAULT, resultException.Message);

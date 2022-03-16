@@ -16,7 +16,7 @@ namespace TimeTable.DataAccess.Contracts.Repositories
         Task<TimeRecordEntity> GetAsync(int id);
         Task<TimeRecordEntity> GetAsync(int id, int personId);
         Task AddAsync(TimeRecordEntity entity);
-        Task UpdateAsync(TimeRecordEntity entity);
-        Task DeleteAsync(int id);
+        Task<TimeRecordEntity> AttachAsync(int id, byte[] rowVersion);
+        Task DeleteAsync(int id, byte[] rowVersion);
     }
 }

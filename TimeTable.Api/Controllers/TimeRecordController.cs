@@ -126,14 +126,14 @@ namespace TimeTable.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpPut]
+        [Route("delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromBody] DeleteRequest deleteRequest)
         {
-            await service.DeleteAsync(id);
+            await service.DeleteAsync(deleteRequest);
             return NoContent();
         }
     }

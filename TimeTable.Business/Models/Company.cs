@@ -10,5 +10,8 @@ namespace TimeTable.Business.Models
         [MaxLength(450)]
         [MinLength(4)]
         public string Name { get; set; }
+
+        [Required]
+        public byte[] RowVersion { get; set; }
     }
 }

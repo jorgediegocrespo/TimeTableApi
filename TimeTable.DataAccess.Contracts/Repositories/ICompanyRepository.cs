@@ -6,6 +6,6 @@ namespace TimeTable.DataAccess.Contracts.Repositories
     public interface ICompanyRepository
     {
         Task<CompanyEntity> GetAsync();
-        Task UpdateAsync(CompanyEntity entity);
+        Task<CompanyEntity> AttachAsync(int id, byte[] rowVersion);
     }
 }

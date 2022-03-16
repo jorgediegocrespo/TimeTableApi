@@ -17,43 +17,66 @@ namespace TimeTable.DataAccess.Repositories
 
         protected override DbSet<TimeRecordEntity> DbEntity => dbContext.TimeRecords;
 
-        public async Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime) =>
+        public async Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime) => //TODO Include personId
             await DbEntity.Where(x =>
                 x.Id != id &&
-                x.StartDateTime.UtcDateTime <= dateTime.UtcDateTime &&
+                DateTimeOffset.Compare(x.StartDateTime, dateTime) <= 0 &&
                 x.EndDateTime.HasValue &&
-                x.EndDateTime.Value.UtcDateTime >= dateTime.UtcDateTime)
+                DateTimeOffset.Compare(x.EndDateTime.Value, dateTime) >= 0)
             .AnyAsync();
 
         public async Task<int> GetTotalRecordsAsync() => await DbEntity.CountAsync();
 
         public async Task<int> GetTotalRecordsAsync(int personId) => await DbEntity.CountAsync(x => x.PersonId == personId);
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber) => 
-            await DbEntity.OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int pageSize, int pageNumber)
+        {
+            var result = await DbEntity.OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            dbContext.ChangeTracker.Clear();
 
-        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId, int pageSize, int pageNumber) => 
-            await DbEntity.Where(x => x.PersonId == personId).OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            return result;
+        }
 
-        public async Task<TimeRecordEntity> GetAsync(int id) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
+        public async Task<IEnumerable<TimeRecordEntity>> GetAllAsync(int personId, int pageSize, int pageNumber)
+        {
+            var result = await DbEntity.Where(x => x.PersonId == personId).OrderBy(x => x.StartDateTime).Paginate(pageSize, pageNumber).ToListAsync();
+            dbContext.ChangeTracker.Clear();
 
-        public async Task<TimeRecordEntity> GetAsync(int id, int personId) => await DbEntity.FirstOrDefaultAsync(x => x.Id == id && x.PersonId == personId);
+            return result;
+        }
+
+        public async Task<TimeRecordEntity> GetAsync(int id)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.Id == id);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
+
+        public async Task<TimeRecordEntity> GetAsync(int id, int personId)
+        {
+            var result = await DbEntity.FirstOrDefaultAsync(x => x.Id == id && x.PersonId == personId);
+            dbContext.ChangeTracker.Clear();
+
+            return result;
+        }
 
         public async Task AddAsync(TimeRecordEntity entity)
         {
             await DbEntity.AddAsync(entity);
         }
 
-        public Task UpdateAsync(TimeRecordEntity entity)
+        public Task<TimeRecordEntity> AttachAsync(int id, byte[] rowVersion)
         {
-            DbEntity.Update(entity);
-            return Task.CompletedTask;
+            var entity = new TimeRecordEntity { Id = id, RowVersion = rowVersion };
+            DbEntity.Attach(entity);
+
+            return Task.FromResult(entity);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, byte[] rowVersion)
         {
-            var entityToRemove = await DbEntity.SingleAsync(x => x.Id == id);
-            DbEntity.Remove(entityToRemove);
+            await DbEntity.RemoveConcurrently(id, rowVersion);
         }
     }
 }

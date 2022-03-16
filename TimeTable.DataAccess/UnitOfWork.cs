@@ -14,6 +14,11 @@ namespace TimeTable.DataAccess
             this.timeTableDbContext = timeTableDbContext;
         }
 
+        public void ClearTracker()
+        {
+            timeTableDbContext.ChangeTracker.Clear();
+        }
+
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return timeTableDbContext.SaveChangesAsync(cancellationToken);

@@ -76,27 +76,29 @@ namespace TimeTable.Application.Services
         {
             PersonEntity entity = await repository.GetAsync(businessModel.Id);
             await ValidateEntityToUpdateAsync(entity, businessModel);
-            MapUpdating(entity, businessModel);
-            await repository.UpdateAsync(entity);
+
+            PersonEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+            MapUpdating(entityToUpdate, businessModel);
             await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(DeleteRequest deleteRequest)
         {
             await unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                PersonEntity person = await repository.GetAsync(id);
-                ValidateEntityToDelete(person, id);
-                await repository.DeleteAsync(id);
+                PersonEntity person = await repository.GetAsync(deleteRequest.Id);
+                ValidateEntityToDelete(person);
+
+                await repository.DeleteAsync(deleteRequest.Id, deleteRequest.RowVersion);
                 await unitOfWork.SaveChangesAsync();
                 await userService.DeleteAsync(person.UserId);
             });
         }
 
-        public async Task DeleteOwnAsync()
+        public async Task DeleteOwnAsync(DeleteOwnRequest deleteRequest)
         {
             int? id = await userService.GetContextPersonIdAsync();
-            await DeleteAsync(id.Value);
+            await DeleteAsync(new DeleteRequest { Id = id.Value, RowVersion = deleteRequest.RowVersion });
         }
 
         private ReadingPerson MapReading(PersonEntity entity)
@@ -108,6 +110,7 @@ namespace TimeTable.Application.Services
                     Id = entity.Id,
                     Name = entity.Name,
                     IsDefault = entity.IsDefault,
+                    RowVersion = entity.RowVersion,
                 };
         }
 
@@ -124,6 +127,7 @@ namespace TimeTable.Application.Services
         {
             entity.Name = businessModel.Name;
             entity.IsDefault = false;
+            entity.RowVersion = businessModel.RowVersion;
         }
 
         private async Task ValidateEntityToAddAsync(CreatingPerson businessModel)
@@ -144,8 +148,11 @@ namespace TimeTable.Application.Services
                 throw new ForbidenActionException();
         }
 
-        private void ValidateEntityToDelete(PersonEntity person, int id)
+        private void ValidateEntityToDelete(PersonEntity person)
         {
+            if (person == null)
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There persont to remove does not exits");
+
             if (person.IsDefault)
                 throw new NotValidOperationException(ErrorCodes.PERSON_DEFAULT, $"A default person could not be removed");
         }

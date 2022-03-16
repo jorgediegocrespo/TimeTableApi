@@ -22,8 +22,4 @@
     <ProjectReference Include="..\TimeTable.DataAccess.Contracts\TimeTable.DataAccess.Contracts.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EntityConfig\Base\" />
-  </ItemGroup>
-
 </Project>

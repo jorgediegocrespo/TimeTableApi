@@ -183,10 +183,11 @@ namespace TimeTable.Application.Tests.Services
                 Id = 1,
                 StartDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1)),
                 EndDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1).AddHours(7)),
+                RowVersion = Array.Empty<byte>()
             };
             timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecord.Id)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecord.Id));
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<TimeRecordEntity>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new TimeRecordEntity { Id = timeRecord.Id, RowVersion = timeRecord .RowVersion});
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.StartDateTime)).ReturnsAsync(false);
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.EndDateTime.Value)).ReturnsAsync(false);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -206,10 +207,11 @@ namespace TimeTable.Application.Tests.Services
                 Id = 1,
                 StartDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1)),
                 EndDateTime = null,
+                RowVersion = Array.Empty<byte>()
             };
             timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecord.Id)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecord.Id));
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<TimeRecordEntity>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new TimeRecordEntity { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion});
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.StartDateTime)).ReturnsAsync(false);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -228,10 +230,11 @@ namespace TimeTable.Application.Tests.Services
                 Id = 2,
                 StartDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1)),
                 EndDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1).AddHours(7)),
+                RowVersion = Array.Empty<byte>(),
             };
             timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecord.Id)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecord.Id));
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<TimeRecordEntity>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new TimeRecordEntity { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion });
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.StartDateTime)).ReturnsAsync(false);
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.EndDateTime.Value)).ReturnsAsync(false);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -250,10 +253,11 @@ namespace TimeTable.Application.Tests.Services
                 Id = 1,
                 StartDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1)),
                 EndDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1).AddHours(7)),
+                RowVersion = Array.Empty<byte>(),
             };
             timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecord.Id)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecord.Id));
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<TimeRecordEntity>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new TimeRecordEntity { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion });
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.StartDateTime)).ReturnsAsync(true);
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.EndDateTime.Value)).ReturnsAsync(false);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -272,10 +276,11 @@ namespace TimeTable.Application.Tests.Services
                 Id = 1,
                 StartDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1)),
                 EndDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-1).AddHours(7)),
+                RowVersion = Array.Empty<byte>(),
             };
             timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecord.Id)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecord.Id));
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<TimeRecordEntity>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.AttachAsync(It.IsAny<int>(), It.IsAny<byte[]>())).ReturnsAsync(new TimeRecordEntity { Id = timeRecord.Id, RowVersion = timeRecord.RowVersion });
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.StartDateTime)).ReturnsAsync(false);
             timeRecordRepositoryMock.Setup(x => x.ExistsOverlappingAsync(timeRecord.Id, timeRecord.EndDateTime.Value)).ReturnsAsync(true);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -290,13 +295,14 @@ namespace TimeTable.Application.Tests.Services
         {
             int personId = 1;
             int timeRecordId = 1;
-            timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecordId)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecordId));
+            TimeRecordEntity givenTimeRecord = GivenTimeRecordWithEndDatetime(timeRecordId);
+            timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecordId)).ReturnsAsync(givenTimeRecord);
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<byte[]>())).Returns(Task.CompletedTask);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
             TimeRecordService timeRecordService = new TimeRecordService(unitOfWorkMock.Object, timeRecordRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
-            Task result = timeRecordService.DeleteAsync(timeRecordId);
+            Task result = timeRecordService.DeleteAsync(new DeleteRequest { Id = givenTimeRecord.Id, RowVersion = givenTimeRecord.RowVersion });
             
             Assert.AreEqual(Task.CompletedTask, result);
         }
@@ -306,25 +312,30 @@ namespace TimeTable.Application.Tests.Services
         {
             int personId = 1;
             int timeRecordId = 2;
-            timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecordId)).ReturnsAsync(GivenTimeRecordWithEndDatetime(timeRecordId));
+            var givenTimeRecord = GivenTimeRecordWithEndDatetime(timeRecordId);
+            timeRecordRepositoryMock.Setup(x => x.GetAsync(timeRecordId)).ReturnsAsync(givenTimeRecord);
             userServiceMock.Setup(x => x.GetContextPersonIdAsync()).ReturnsAsync(personId);
-            timeRecordRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
+            timeRecordRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<int>(), It.IsAny<byte[]>())).Returns(Task.CompletedTask);
             unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
             TimeRecordService timeRecordService = new TimeRecordService(unitOfWorkMock.Object, timeRecordRepositoryMock.Object, appConfigMock.Object, userServiceMock.Object);
 
-            await Assert.ThrowsExceptionAsync<ForbidenActionException>(() => timeRecordService.DeleteAsync(timeRecordId));
+            await Assert.ThrowsExceptionAsync<ForbidenActionException>(() => timeRecordService.DeleteAsync(new DeleteRequest { Id = givenTimeRecord.Id, RowVersion = givenTimeRecord.RowVersion }));
         }
 
         private List<TimeRecordEntity> GivenTimeRecordList(int count)
         {
+            Random rnd = new Random();
+
             var result = new List<TimeRecordEntity>();
             for (int i = 1; i <= count; i++)
             {
+                Byte[] rndRowVersion = new Byte[8];
+                rnd.NextBytes(rndRowVersion);
                 var startDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-i));
                 var endDateTime = startDateTime.AddHours(i % 8);
 
-                result.Add(new TimeRecordEntity { Id = i, PersonId = i, StartDateTime = startDateTime, EndDateTime = endDateTime });
+                result.Add(new TimeRecordEntity { Id = i, PersonId = i, StartDateTime = startDateTime, EndDateTime = endDateTime, RowVersion = rndRowVersion });
             }
 
             return result;
@@ -332,17 +343,24 @@ namespace TimeTable.Application.Tests.Services
 
         private TimeRecordEntity GivenTimeRecordWithEndDatetime(int timeRecordId)
         {
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
+
             var startDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-timeRecordId));
             var endDateTime = startDateTime.AddHours(timeRecordId % 8);
-
-            return new TimeRecordEntity { Id = timeRecordId, PersonId = timeRecordId, StartDateTime = startDateTime, EndDateTime = endDateTime };
+            
+            return new TimeRecordEntity { Id = timeRecordId, PersonId = timeRecordId, StartDateTime = startDateTime, EndDateTime = endDateTime, RowVersion = rndRowVersion };
         }
 
         private TimeRecordEntity GivenTimeRecordWithoutEndDatetime(int timeRecordId)
         {
+            Random rnd = new Random();
+            Byte[] rndRowVersion = new Byte[8];
+            rnd.NextBytes(rndRowVersion);
             var startDateTime = new DateTimeOffset(DateTime.UtcNow.AddDays(-timeRecordId));
             
-            return new TimeRecordEntity { Id = timeRecordId, PersonId = timeRecordId, StartDateTime = startDateTime, EndDateTime = null };
+            return new TimeRecordEntity { Id = timeRecordId, PersonId = timeRecordId, StartDateTime = startDateTime, EndDateTime = null, RowVersion = rndRowVersion };
         }
     }
 }
