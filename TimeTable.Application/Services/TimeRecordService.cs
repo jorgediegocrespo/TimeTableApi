@@ -67,7 +67,7 @@ namespace TimeTable.Application.Services
         public async Task<int> AddAsync(CreatingTimeRecord businessModel)
         {
             int? personId = await userService.GetContextPersonIdAsync();
-            await ValidateEntityToAddAsync(businessModel);
+            await ValidateEntityToAddAsync(businessModel, personId.Value);
             TimeRecordEntity entity = MapCreating(businessModel, personId.Value);
             await repository.AddAsync(entity);
             await unitOfWork.SaveChangesAsync();
@@ -77,8 +77,9 @@ namespace TimeTable.Application.Services
 
         public async Task UpdateAsync(UpdatingTimeRecord businessModel)
         {
+            int? personId = await userService.GetContextPersonIdAsync();
             TimeRecordEntity entity = await repository.GetAsync(businessModel.Id);
-            await ValidateEntityToUpdateAsync(entity, businessModel);
+            await ValidateEntityToUpdateAsync(entity, businessModel, personId.Value);
 
             TimeRecordEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
             MapUpdating(entityToUpdate, businessModel);
@@ -125,34 +126,33 @@ namespace TimeTable.Application.Services
             entity.RowVersion = businessModel.RowVersion;
         }
 
-        private async Task ValidateEntityToAddAsync(CreatingTimeRecord businessModel)
+        private async Task ValidateEntityToAddAsync(CreatingTimeRecord businessModel, int personId)
         {
-            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.StartDateTime);
+            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, personId, businessModel.StartDateTime);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 
             if (!businessModel.EndDateTime.HasValue)
                 return;
 
-            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, businessModel.EndDateTime.Value);
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(0, personId, businessModel.EndDateTime.Value);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
         }
 
-        private async Task ValidateEntityToUpdateAsync(TimeRecordEntity entity, UpdatingTimeRecord businessModel)
+        private async Task ValidateEntityToUpdateAsync(TimeRecordEntity entity, UpdatingTimeRecord businessModel, int personId)
         {
-            int? personId = await userService.GetContextPersonIdAsync();
-            if (entity.PersonId != personId.Value)
+            if (entity.PersonId != personId)
                 throw new ForbidenActionException();
 
-            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.StartDateTime);
+            bool existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, personId, businessModel.StartDateTime);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 
             if (!businessModel.EndDateTime.HasValue)
                 return;
 
-            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, businessModel.EndDateTime.Value);
+            existsOverlappingTimeRecord = await repository.ExistsOverlappingAsync(businessModel.Id, personId, businessModel.EndDateTime.Value);
             if (existsOverlappingTimeRecord)
                 throw new NotValidOperationException(ErrorCodes.TIME_RECORD_OVERLAPPING_EXISTS, $"There is another time record overlapping with this one");
 

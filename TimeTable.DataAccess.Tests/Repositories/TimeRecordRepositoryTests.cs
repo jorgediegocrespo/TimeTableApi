@@ -25,7 +25,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             TimeRecordRepository timeRecordRepository = new TimeRecordRepository(timeTableContext);
-            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, new DateTimeOffset(2022, 1, 2, 16, 0, 0, TimeSpan.FromHours(2)));
+            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, person1.Id, new DateTimeOffset(2022, 1, 2, 16, 0, 0, TimeSpan.FromHours(2)));
 
             Assert.AreEqual(true, result);
         }
@@ -41,7 +41,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             TimeRecordRepository timeRecordRepository = new TimeRecordRepository(timeTableContext);
-            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, new DateTimeOffset(2022, 1, 2, 10, 25, 40, TimeSpan.FromHours(0)));
+            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, person1.Id, new DateTimeOffset(2022, 1, 2, 10, 25, 40, TimeSpan.FromHours(0)));
 
             Assert.AreEqual(false, result);
         }
@@ -57,7 +57,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             TimeRecordRepository timeRecordRepository = new TimeRecordRepository(timeTableContext);
-            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, new DateTimeOffset(2022, 1, 3, 9, 0, 0, TimeSpan.FromHours(0)));
+            bool result = await timeRecordRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, person1.Id, new DateTimeOffset(2022, 1, 3, 9, 0, 0, TimeSpan.FromHours(0)));
 
             Assert.AreEqual(false, result);
         }
@@ -73,7 +73,23 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             TimeRecordRepository personRepository = new TimeRecordRepository(timeTableContext);
-            bool result = await personRepository.ExistsOverlappingAsync(timeRecordToAdd.Id, new DateTimeOffset(2022, 1, 2, 9, 0, 0, TimeSpan.FromHours(0)));
+            bool result = await personRepository.ExistsOverlappingAsync(timeRecordToAdd.Id, person1.Id, new DateTimeOffset(2022, 1, 2, 9, 0, 0, TimeSpan.FromHours(0)));
+
+            Assert.AreEqual(false, result);
+        }
+
+        [TestMethod]
+        public async Task ExistsOverlapping_FalseDifferentPerson()
+        {
+            TimeTableDbContext timeTableContext = await GetLocalDbTimeTableContext(Guid.NewGuid().ToString());
+            PersonEntity person1 = new PersonEntity { Name = "Person 1", User = new IdentityUser("user1") };
+            var timeRecordToAdd = new TimeRecordEntity { Person = person1, StartDateTime = new DateTimeOffset(2022, 1, 2, 8, 0, 0, TimeSpan.FromHours(0)), EndDateTime = new DateTimeOffset(2022, 1, 2, 15, 0, 0, TimeSpan.FromHours(0)) };
+            await timeTableContext.TimeRecords.AddAsync(timeRecordToAdd);
+            await timeTableContext.SaveChangesAsync();
+            timeTableContext.ChangeTracker.Clear();
+
+            TimeRecordRepository personRepository = new TimeRecordRepository(timeTableContext);
+            bool result = await personRepository.ExistsOverlappingAsync(timeRecordToAdd.Id + 1, person1.Id + 1, new DateTimeOffset(2022, 1, 2, 9, 0, 0, TimeSpan.FromHours(0)));
 
             Assert.AreEqual(false, result);
         }

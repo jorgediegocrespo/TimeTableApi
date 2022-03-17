@@ -17,9 +17,10 @@ namespace TimeTable.DataAccess.Repositories
 
         protected override DbSet<TimeRecordEntity> DbEntity => dbContext.TimeRecords;
 
-        public async Task<bool> ExistsOverlappingAsync(int id, DateTimeOffset dateTime) => //TODO Include personId
+        public async Task<bool> ExistsOverlappingAsync(int id, int personId, DateTimeOffset dateTime) => 
             await DbEntity.Where(x =>
                 x.Id != id &&
+                x.PersonId == personId &&
                 DateTimeOffset.Compare(x.StartDateTime, dateTime) <= 0 &&
                 x.EndDateTime.HasValue &&
                 DateTimeOffset.Compare(x.EndDateTime.Value, dateTime) >= 0)
