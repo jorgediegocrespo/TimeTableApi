@@ -70,7 +70,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = RolesConsts.ADMIN)]
-        public async Task<IActionResult> Post([FromBody]CreatingPerson item)
+        public async Task<IActionResult> Post([FromForm]CreatingPerson item)
         {
             if (item == null)
                 return BadRequest();
@@ -87,7 +87,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Put([FromBody]UpdatingPerson item)
+        public async Task<IActionResult> Put([FromForm] UpdatingPerson item)
         {
             if (item == null)
                 return BadRequest();

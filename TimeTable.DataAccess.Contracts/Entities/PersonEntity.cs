@@ -9,6 +9,7 @@ namespace TimeTable.DataAccess.Contracts.Entities
         public string Name { get; set; }
         public bool IsDefault { get; set; }
         public string UserId { get; set; }
+        public string PictureUrl { get; set; }
         public virtual IdentityUser User { get; set; }
         public virtual List<TimeRecordEntity> TimeRecords { get; set; }
     }

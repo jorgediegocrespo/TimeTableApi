@@ -20,6 +20,7 @@ namespace TimeTable.Application.Tests.Services
     [TestClass]
     public class PersonServiceTests
     {
+        //TODO Add test to get picture url from azure
         private readonly Mock<IUnitOfWork> unitOfWorkMock;
         private readonly Mock<IPersonRepository> personRepositoryMock;
         private readonly Mock<IAppConfig> appConfigMock;

@@ -110,6 +110,7 @@ namespace TimeTable.Application.Services
                     Id = entity.Id,
                     Name = entity.Name,
                     IsDefault = entity.IsDefault,
+                    PictureUrl = entity.PictureUrl,
                     RowVersion = entity.RowVersion,
                 };
         }
@@ -119,7 +120,8 @@ namespace TimeTable.Application.Services
             return new PersonEntity()
             {
                 Name = businessModel.Name,
-                IsDefault = false
+                IsDefault = false,
+                //TODO Set picture url with the azure storage one
             };
         }
 
@@ -127,6 +129,7 @@ namespace TimeTable.Application.Services
         {
             entity.Name = businessModel.Name;
             entity.IsDefault = false;
+            //TODO Set picture url with the azure storage one
             entity.RowVersion = businessModel.RowVersion;
         }
 

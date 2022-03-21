@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace TimeTable.Business.Models
 {
@@ -7,6 +8,7 @@ namespace TimeTable.Business.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsDefault { get; set; }
+        public string PictureUrl { get; set; }
         public byte[] RowVersion { get; set; }
     }
 
@@ -23,6 +25,8 @@ namespace TimeTable.Business.Models
 
         [Required]
         public string Password { get; set; }
+
+        public IFormFile Picture { get; set; }
     }
 
     public class UpdatingPerson
@@ -36,5 +40,7 @@ namespace TimeTable.Business.Models
 
         [Required]
         public byte[] RowVersion { get; set; }
+
+        public IFormFile Picture { get; set; }
     }
 }

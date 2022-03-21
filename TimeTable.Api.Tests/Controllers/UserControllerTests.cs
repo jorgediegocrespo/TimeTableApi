@@ -18,12 +18,12 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_Ok()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            HttpClient client = factory.CreateClient();
+            using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            using HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.AdminPassword };
-            StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
+            using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
             var token = await response.Content.ReadAsStringAsync();
 
             Assert.AreEqual(System.Net.HttpStatusCode.OK, response.StatusCode);
@@ -33,11 +33,11 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NullBadRequest()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            HttpClient client = factory.CreateClient();
+            using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            using HttpClient client = factory.CreateClient();
 
-            StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
+            using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
             
             Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -45,12 +45,12 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NoLoginBadRequest()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            HttpClient client = factory.CreateClient();
+            using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            using HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = null, Password = Constants.AdminPassword };
-            StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
+            using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -58,12 +58,12 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_NoPasswordBadRequest()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            HttpClient client = factory.CreateClient();
+            using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            using HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = null };
-            StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
+            using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -71,12 +71,12 @@ namespace TimeTable.Api.Tests.Controllers
         [TestMethod]
         public async Task Get_InvalidLoginBadRequest()
         {
-            WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            HttpClient client = factory.CreateClient();
+            using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
+            using HttpClient client = factory.CreateClient();
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.EmployeePassword };
-            StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
+            using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
 
             Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
         }

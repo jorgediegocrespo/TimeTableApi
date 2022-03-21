@@ -195,7 +195,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             {
                 new PersonEntity { Name = "Person 1" },
                 new PersonEntity { Name = "Person 3" },
-                new PersonEntity { Name = "Person 5" },
+                new PersonEntity { Name = "Person 5", PictureUrl = "https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g" },
                 new PersonEntity { Name = "Person 7" },
                 new PersonEntity { Name = "Person 6" },
                 new PersonEntity { Name = "Person 4" },
@@ -209,6 +209,8 @@ namespace TimeTable.DataAccess.Tests.Repositories
             var result = await personRepository.GetAsync(3);
 
             Assert.AreEqual(3, result.Id);
+            Assert.AreEqual("Person 5", result.Name);
+            Assert.AreEqual("https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g", result.PictureUrl);
         }
 
         [TestMethod]
@@ -225,7 +227,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
                 new PersonEntity { Name = "Person 4", User = new IdentityUser("user4") },
                 new PersonEntity { Name = "Person 2", User = new IdentityUser("user2") }
             };
-            var toRead = new PersonEntity { Name = "Person 8", User = new IdentityUser("user8") };
+            var toRead = new PersonEntity { Name = "Person 8", User = new IdentityUser("user8"), PictureUrl = "https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g" };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.People.AddAsync(toRead);
             await timeTableContext.SaveChangesAsync();
@@ -235,6 +237,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             var result = await personRepository.GetAsync(toRead.UserId);
 
             Assert.AreEqual("Person 8", result.Name);
+            Assert.AreEqual("https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g", result.PictureUrl);
         }
 
         [TestMethod]
@@ -244,7 +247,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
             timeTableContext.ChangeTracker.Clear();
 
             PersonRepository personRepository = new PersonRepository(timeTableContext);
-            await personRepository.AddAsync(new PersonEntity { Name = "Person 1" });
+            await personRepository.AddAsync(new PersonEntity { Name = "Person 1", PictureUrl = "https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g" });
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();
@@ -265,7 +268,7 @@ namespace TimeTable.DataAccess.Tests.Repositories
                 new PersonEntity { Name = "Person 4", User = new IdentityUser("user4") },
                 new PersonEntity { Name = "Person 2", User = new IdentityUser("user2") }
             };
-            var toUpdate = new PersonEntity { Name = "Person 8", User = new IdentityUser("user8") };
+            var toUpdate = new PersonEntity { Name = "Person 8", User = new IdentityUser("user8"), PictureUrl = "https://secure.gravatar.com/avatar/f8ee566613f4c3742cebd790647b2deb?s=160&d=identicon&r=g" };
             await timeTableContext.People.AddRangeAsync(sourceList);
             await timeTableContext.People.AddAsync(toUpdate);
             await timeTableContext.SaveChangesAsync();
@@ -274,11 +277,13 @@ namespace TimeTable.DataAccess.Tests.Repositories
             PersonRepository personRepository = new PersonRepository(timeTableContext);
             var entity = await personRepository.AttachAsync(toUpdate.Id, toUpdate.RowVersion);
             entity.Name = "Updated";
+            entity.PictureUrl = "https://jorgediegocrespo.files.wordpress.com/2021/09/headeranimation.jpg";
             await timeTableContext.SaveChangesAsync();
 
             timeTableContext.ChangeTracker.Clear();
             var validation = await timeTableContext.People.FirstAsync(x => x.Id == 8);
-            Assert.AreEqual(validation.Name, "Updated");
+            Assert.AreEqual("Updated", validation.Name);
+            Assert.AreEqual("https://jorgediegocrespo.files.wordpress.com/2021/09/headeranimation.jpg", validation.PictureUrl);
         }
 
         [TestMethod]
