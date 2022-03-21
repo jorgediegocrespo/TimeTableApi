@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
+using TimeTable.Business.ValidationAttributes;
 
 namespace TimeTable.Business.Models
 {
@@ -26,6 +27,7 @@ namespace TimeTable.Business.Models
         [Required]
         public string Password { get; set; }
 
+        [FormFileMaxMegabytesValidation(1)]
         public IFormFile Picture { get; set; }
     }
 
@@ -41,6 +43,7 @@ namespace TimeTable.Business.Models
         [Required]
         public byte[] RowVersion { get; set; }
 
+        [FormFileMaxMegabytesValidation(1)]
         public IFormFile Picture { get; set; }
     }
 }
