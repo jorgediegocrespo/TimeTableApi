@@ -15,17 +15,24 @@ namespace TimeTable.Application.Services
 {
     public class PersonService : BaseService, IPersonService
     {
+        private const string PERSON_PICTURE_CONTAINER = "People";
+        private const string PERSON_PICTURE_EXTENSION = ".jpeg";
+        private const string PERSON_PICTURE_CONTENT_TYPE = "image/jpeg";
+
         private readonly IPersonRepository repository;
         private readonly IUserService userService;
+        private readonly IFileStorage fileStorage;
 
         public PersonService(IUnitOfWork unitOfWork,
                              IPersonRepository repository,
                              IAppConfig appConfig,
-                             IUserService userService)
+                             IUserService userService,
+                             IFileStorage fileStorage)
             : base(unitOfWork, appConfig)
         {
             this.repository = repository;
             this.userService = userService;
+            this.fileStorage = fileStorage;
         }
 
         public async Task<PaginatedResponse<ReadingPerson>> GetAllAsync(PaginationRequest request)
@@ -65,6 +72,8 @@ namespace TimeTable.Application.Services
 
                 var entity = MapCreating(businessModel);
                 entity.UserId = userId;
+                entity.PictureUrl = await fileStorage.SaveFileAsync(businessModel.Picture, PERSON_PICTURE_EXTENSION, PERSON_PICTURE_CONTAINER, PERSON_PICTURE_CONTENT_TYPE);
+
                 await repository.AddAsync(entity);
                 await unitOfWork.SaveChangesAsync();
 
@@ -74,12 +83,17 @@ namespace TimeTable.Application.Services
 
         public async Task UpdateAsync(UpdatingPerson businessModel)
         {
-            PersonEntity entity = await repository.GetAsync(businessModel.Id);
-            await ValidateEntityToUpdateAsync(entity, businessModel);
+            await unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                PersonEntity entity = await repository.GetAsync(businessModel.Id);
+                await ValidateEntityToUpdateAsync(entity, businessModel);
 
-            PersonEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
-            MapUpdating(entityToUpdate, businessModel);
-            await unitOfWork.SaveChangesAsync();
+                PersonEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
+                MapUpdating(entityToUpdate, businessModel);
+                entity.PictureUrl = await fileStorage.UpdateFileAsync(businessModel.Picture, PERSON_PICTURE_EXTENSION, PERSON_PICTURE_CONTAINER, entity.PictureUrl, PERSON_PICTURE_CONTENT_TYPE);
+
+                await unitOfWork.SaveChangesAsync();
+            });
         }
 
         public async Task DeleteAsync(DeleteRequest deleteRequest)
@@ -92,6 +106,7 @@ namespace TimeTable.Application.Services
                 await repository.DeleteAsync(deleteRequest.Id, deleteRequest.RowVersion);
                 await unitOfWork.SaveChangesAsync();
                 await userService.DeleteAsync(person.UserId);
+                await fileStorage.DeleteFileAsync(PERSON_PICTURE_CONTAINER, person.PictureUrl);
             });
         }
 
@@ -121,7 +136,6 @@ namespace TimeTable.Application.Services
             {
                 Name = businessModel.Name,
                 IsDefault = false,
-                //TODO Set picture url with the azure storage one
             };
         }
 
@@ -129,7 +143,6 @@ namespace TimeTable.Application.Services
         {
             entity.Name = businessModel.Name;
             entity.IsDefault = false;
-            //TODO Set picture url with the azure storage one
             entity.RowVersion = businessModel.RowVersion;
         }
 

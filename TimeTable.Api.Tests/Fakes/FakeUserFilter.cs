@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TimeTable.Business.ConstantValues;
 
-namespace TimeTable.Api.Tests
+namespace TimeTable.Api.Tests.Fakes
 {
     public class FakeUserFilter : IAsyncActionFilter
     {

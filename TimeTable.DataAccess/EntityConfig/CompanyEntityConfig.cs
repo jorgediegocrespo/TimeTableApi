@@ -14,6 +14,7 @@ namespace TimeTable.DataAccess.EntityConfig
             entityBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             entityBuilder.Property(x => x.Name).IsRequired(true);
+            entityBuilder.Property(x => x.RowVersion).IsRequired(true);
 
             entityBuilder.HasQueryFilter(x => !x.IsDeleted);
 

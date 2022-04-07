@@ -50,10 +50,10 @@ namespace TimeTable.Api.Config
         public static IApplicationBuilder AddRegistration(this IApplicationBuilder app)
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/TimeTableApi/swagger/v1/swagger.json", "TimeTable API V1"));
+            //app.UseSwaggerUI(c => c.SwaggerEndpoint("/TimeTableApi/swagger/v1/swagger.json", "TimeTable API V1"));
 
             //TODO Use it with kestrel
-            //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeTable API V1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeTable API V1"));
 
             return app;
         }

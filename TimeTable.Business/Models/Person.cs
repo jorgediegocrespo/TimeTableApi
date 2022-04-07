@@ -27,8 +27,8 @@ namespace TimeTable.Business.Models
         [Required]
         public string Password { get; set; }
 
-        [FormFileMaxMegabytesValidation(1)]
-        public IFormFile Picture { get; set; }
+        [ByteArrayMaxMegabytesValidation(500)]
+        public byte[] Picture { get; set; }
     }
 
     public class UpdatingPerson
@@ -43,7 +43,7 @@ namespace TimeTable.Business.Models
         [Required]
         public byte[] RowVersion { get; set; }
 
-        [FormFileMaxMegabytesValidation(1)]
-        public IFormFile Picture { get; set; }
+        [ByteArrayMaxMegabytesValidation(500)]
+        public byte[] Picture { get; set; }
     }
 }

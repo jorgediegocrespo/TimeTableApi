@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeTable.Api.Tests.Fakes;
+using TimeTable.Application.Contracts.Services;
 using TimeTable.Business.ConstantValues;
 using TimeTable.DataAccess;
 using TimeTable.DataAccess.Contracts.Entities;
@@ -43,6 +45,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
                         .UseSqlServer(connectionString, options => options.UseNetTopologySuite())
                         .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
 
+                    services.AddSingleton<IFileStorage, FakeFileStorage>();
                     services.AddSingleton<IAuthorizationHandler>(x => new ManageRoleAccessHandler(userRole));
                     services.AddControllers(opt => opt.Filters.Add(new FakeUserFilter(userRole)));
                 });

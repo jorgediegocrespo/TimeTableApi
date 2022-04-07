@@ -47,6 +47,7 @@ namespace TimeTable.CrossCutting.Register
         private static void RegisterServices(IServiceCollection services)
         {
             services.AddSingleton<ILoggerService, LoggerService>();
+            services.AddSingleton<IFileStorage, BlobAzureStorage>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICompanyService, CompanyService>();
             services.AddTransient<IPersonService, PersonService>();

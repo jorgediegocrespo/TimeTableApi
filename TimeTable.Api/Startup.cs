@@ -9,7 +9,6 @@ using System;
 using System.Text;
 using TimeTable.Api.Config;
 using TimeTable.Api.Middleware;
-using TimeTable.Business.ConstantValues;
 using TimeTable.CrossCutting.Middleware;
 using TimeTable.CrossCutting.Register;
 
