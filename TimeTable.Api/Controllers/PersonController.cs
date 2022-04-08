@@ -86,6 +86,7 @@ namespace TimeTable.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Put([FromBody] UpdatingPerson item)
         {
@@ -96,6 +97,26 @@ namespace TimeTable.Api.Controllers
                 return BadRequest();
 
             await service.UpdateAsync(item);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("role")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = RolesConsts.ADMIN)]
+        public async Task<IActionResult> Put([FromBody] UpdatingPersonRole item)
+        {
+            if (item == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            await service.UpdateRoleAsync(item);
             return NoContent();
         }
 

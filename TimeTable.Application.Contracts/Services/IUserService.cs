@@ -6,6 +6,8 @@ namespace TimeTable.Application.Contracts.Services
     public interface IUserService
     {
         Task<string> RegisterAsync(RegisterUserInfo userInfo);
+        Task RemoveFromRoleAsync(string userId);
+        Task AddToRoleAsync(string userId, string role);
         Task<string> LoginAsync(LoginUserInfo userInfo);
         string GetContextUserId();
         Task<int?> GetContextPersonIdAsync();

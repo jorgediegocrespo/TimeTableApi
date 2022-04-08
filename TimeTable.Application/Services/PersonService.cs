@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeTable.Application.Constants;
@@ -6,6 +7,7 @@ using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Application.Exceptions;
 using TimeTable.Application.Services.Base;
+using TimeTable.Business.ConstantValues;
 using TimeTable.Business.Models;
 using TimeTable.DataAccess.Contracts;
 using TimeTable.DataAccess.Contracts.Entities;
@@ -68,6 +70,7 @@ namespace TimeTable.Application.Services
                     Email = businessModel.Email,
                     UserName = businessModel.Name,
                     Password = businessModel.Password,
+                    Role = GetRoleString(businessModel.Role)
                 });
 
                 var entity = MapCreating(businessModel);
@@ -96,6 +99,19 @@ namespace TimeTable.Application.Services
             });
         }
 
+        public async Task UpdateRoleAsync(UpdatingPersonRole businessModel)
+        {
+            await unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                PersonEntity entty = await repository.GetAsync(businessModel.Id);
+                ValidateEntityToUpdateRoleAsync(entty, businessModel);
+
+                await userService.RemoveFromRoleAsync(entty.UserId);
+                var newRole = GetRoleString(businessModel.Role);
+                await userService.AddToRoleAsync(entty.UserId, newRole);
+            });
+        }
+
         public async Task DeleteAsync(DeleteRequest deleteRequest)
         {
             await unitOfWork.ExecuteInTransactionAsync(async () =>
@@ -118,8 +134,8 @@ namespace TimeTable.Application.Services
 
         private ReadingPerson MapReading(PersonEntity entity)
         {
-            return entity == null ? 
-                null : 
+            return entity == null ?
+                null :
                 new ReadingPerson()
                 {
                     Id = entity.Id,
@@ -151,6 +167,9 @@ namespace TimeTable.Application.Services
             bool existsPersonName = await repository.ExistsAsync(0, businessModel.Name);
             if (existsPersonName)
                 throw new NotValidOperationException(ErrorCodes.PERSON_NAME_EXISTS, $"The name {businessModel.Name} already exists in other person");
+
+            if (businessModel.Role == Role.None)
+                throw new NotValidOperationException(ErrorCodes.INVALID_ROLE, "Invalid role");
         }
 
         private async Task ValidateEntityToUpdateAsync(PersonEntity entity, UpdatingPerson businessModel)
@@ -164,13 +183,38 @@ namespace TimeTable.Application.Services
                 throw new ForbidenActionException();
         }
 
+        private void ValidateEntityToUpdateRoleAsync(PersonEntity entity, UpdatingPersonRole businessModel)
+        {
+            if (entity == null)
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"The person to update does not exits");
+
+            if (businessModel.Role == Role.None)
+                throw new NotValidOperationException(ErrorCodes.INVALID_ROLE, "Invalid role");
+
+            if (!entity.RowVersion.SequenceEqual(businessModel.RowVersion))
+                throw new DbUpdateConcurrencyException();
+        }
+
         private void ValidateEntityToDelete(PersonEntity person)
         {
             if (person == null)
-                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"There persont to remove does not exits");
+                throw new NotValidOperationException(ErrorCodes.ITEM_NOT_EXISTS, $"The person to remove does not exits");
 
             if (person.IsDefault)
                 throw new NotValidOperationException(ErrorCodes.PERSON_DEFAULT, $"A default person could not be removed");
+        }
+
+        private string GetRoleString(Role role)
+        {
+            switch (role)
+            {
+                case Role.Admin:
+                    return RolesConsts.ADMIN;
+                case Role.Employee:
+                    return RolesConsts.EMPLOYEE;
+                default:
+                    return string.Empty;
+            }
         }
     }
 }

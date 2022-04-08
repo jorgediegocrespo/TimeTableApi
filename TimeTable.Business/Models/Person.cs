@@ -27,6 +27,9 @@ namespace TimeTable.Business.Models
         [Required]
         public string Password { get; set; }
 
+        [Required]
+        public Role Role { get; set; }
+
         [ByteArrayMaxMegabytesValidation(500)]
         public byte[] Picture { get; set; }
     }
@@ -45,5 +48,23 @@ namespace TimeTable.Business.Models
 
         [ByteArrayMaxMegabytesValidation(500)]
         public byte[] Picture { get; set; }
+    }
+
+    public class UpdatingPersonRole
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public Role Role { get; set; }
+
+        [Required]
+        public byte[] RowVersion { get; set; }
+    }
+
+    public enum Role
+    {
+        None,
+        Admin,
+        Employee
     }
 }

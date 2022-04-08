@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using TimeTable.Application.Constants;
 using TimeTable.Application.Exceptions;
 
 namespace TimeTable.CrossCutting.Middleware
@@ -43,6 +45,11 @@ namespace TimeTable.CrossCutting.Middleware
                     break;
                 case ForbidenActionException forbidenActionException:
                     statusCode = HttpStatusCode.Forbidden;
+                    break;
+                case DbUpdateConcurrencyException updateConcurrencyException:
+                    statusCode = HttpStatusCode.Conflict;
+                    errorCode = ErrorCodes.CONCURRENCY_ERROR;
+                    errorDescription = "Concurrency error";
                     break;
             }
 

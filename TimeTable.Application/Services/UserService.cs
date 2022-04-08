@@ -46,11 +46,36 @@ namespace TimeTable.Application.Services
                 Email = userInfo.Email,
             };
 
-            var result = await userManager.CreateAsync(user, userInfo.Password);
-            if (!result.Succeeded)
-                throw new NotValidOperationException(ErrorCodes.USER_REGISTER_ERROR, $"Error registering user");
+            var createResult = await userManager.CreateAsync(user, userInfo.Password);
+            if (!createResult.Succeeded)
+                throw new NotValidOperationException(ErrorCodes.USER_REGISTER_ERROR, "Error registering user");
+
+            var addToRoleResult = await userManager.AddToRoleAsync(user, userInfo.Role);
+            if (!addToRoleResult.Succeeded)
+                throw new NotValidOperationException(ErrorCodes.USER_UPDATING_ROLE_ERROR, "Error setting user role");
 
             return await userManager.GetUserIdAsync(user);
+        }
+
+        public async Task RemoveFromRoleAsync(string userId)
+        {
+            IdentityUser user = await userManager.FindByIdAsync(userId);
+
+            IList<string> roles = await userManager.GetRolesAsync(user);
+            foreach (string role in roles)
+            {
+                var result = await userManager.RemoveFromRoleAsync(user, role);
+                if (!result.Succeeded)
+                    throw new NotValidOperationException(ErrorCodes.USER_UPDATING_ROLE_ERROR, "Error setting user role");
+            }
+        }
+
+        public async Task AddToRoleAsync(string userId, string role)
+        {
+            IdentityUser user = await userManager.FindByIdAsync(userId);
+            var result = await userManager.AddToRoleAsync(user, role);
+            if (!result.Succeeded)
+                throw new NotValidOperationException(ErrorCodes.USER_UPDATING_ROLE_ERROR, "Error setting user role");
         }
 
         public async Task<string> LoginAsync(LoginUserInfo userInfo)

@@ -8,5 +8,8 @@
         public const string PERSON_DEFAULT = "PERSON_DEFAULT";
         public const string TIME_RECORD_OVERLAPPING_EXISTS = "TIME_RECORD_OVERLAPPING_EXISTS";
         public const string USER_REGISTER_ERROR = "USER_REGISTER_ERROR";
+        public const string USER_UPDATING_ROLE_ERROR = "USER_UPDATING_ROLE_ERROR";
+        public const string CONCURRENCY_ERROR = "CONCURRENCY_ERROR";
+        public const string INVALID_ROLE = "INVALID_ROLE";
     }
 }
