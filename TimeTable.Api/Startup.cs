@@ -7,8 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using TimeTable.Api.ApiServices;
 using TimeTable.Api.Config;
 using TimeTable.Api.Middleware;
+using TimeTable.Application.Contracts.Services;
 using TimeTable.CrossCutting.Middleware;
 using TimeTable.CrossCutting.Register;
 
@@ -26,8 +28,13 @@ namespace TimeTable.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            if (!Configuration.GetValue<bool>("UseAzureStorage"))
+                services.AddTransient<IWebPathsService, WebPathsService>();
+
+            services.AddHttpContextAccessor();
+            
             IocRegister.RegisterDbContext(services, Configuration.GetConnectionString("DataBaseConnection"));
-            IocRegister.AddRegistration(services);
+            IocRegister.AddRegistration(services, Configuration.GetValue<bool>("UseAzureStorage"));
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
@@ -53,6 +60,9 @@ namespace TimeTable.Api
 
             SwaggerConfig.AddRegistration(app);
             app.UseHttpsRedirection();
+            if (!Configuration.GetValue<bool>("UseAzureStorage"))
+                app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();

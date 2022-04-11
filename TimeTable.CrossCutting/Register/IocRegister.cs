@@ -15,16 +15,17 @@ namespace TimeTable.CrossCutting.Register
 {
     public static class IocRegister
     {
+
         public static void RegisterDbContext(IServiceCollection services, string connectionString)
         {
             DataAccess.Startup.RegisterDbContext(services, connectionString);
             services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
 
-        public static void AddRegistration(this IServiceCollection services)
+        public static void AddRegistration(this IServiceCollection services, bool useAzureStorage)
         {
             RegisterRepositories(services);
-            RegisterServices(services);
+            RegisterServices(services, useAzureStorage);
             RegisterOthers(services);
         }
 
@@ -44,14 +45,18 @@ namespace TimeTable.CrossCutting.Register
             services.AddTransient<ITimeRecordRepository, TimeRecordRepository>();
         }
 
-        private static void RegisterServices(IServiceCollection services)
+        private static void RegisterServices(IServiceCollection services, bool useAzureStorage)
         {
             services.AddSingleton<ILoggerService, LoggerService>();
-            services.AddSingleton<IFileStorage, BlobAzureStorage>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICompanyService, CompanyService>();
             services.AddTransient<IPersonService, PersonService>();
             services.AddTransient<ITimeRecordService, TimeRecordService>();
+
+            if (useAzureStorage)
+                services.AddTransient<IFileStorageService, BlobAzureStorageService>();
+            else
+                services.AddTransient<IFileStorageService, LocalStorageService>();
         }
 
         private static void RegisterOthers(IServiceCollection services)

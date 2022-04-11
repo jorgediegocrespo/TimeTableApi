@@ -19,7 +19,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.AdminPassword };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
@@ -34,7 +34,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync($"{url}/login", content);
@@ -46,7 +46,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_NoLoginBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = null, Password = Constants.AdminPassword };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
@@ -59,7 +59,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_NoPasswordBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = null };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");
@@ -72,7 +72,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_InvalidLoginBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             LoginUserInfo loginUserInfo = new LoginUserInfo { UserName = Constants.AdminName, Password = Constants.EmployeePassword };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(loginUserInfo), Encoding.UTF8, "application/json");

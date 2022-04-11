@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TimeTable.Api.Tests.Fakes;
 using TimeTable.Application.Contracts.Services;
@@ -45,7 +46,7 @@ namespace TimeTable.Api.Tests.Controllers.Base
                         .UseSqlServer(connectionString, options => options.UseNetTopologySuite())
                         .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
 
-                    services.AddSingleton<IFileStorage, FakeFileStorage>();
+                    services.AddSingleton<IFileStorageService, FakeFileStorage>();
                     services.AddSingleton<IAuthorizationHandler>(x => new ManageRoleAccessHandler(userRole));
                     services.AddControllers(opt => opt.Filters.Add(new FakeUserFilter(userRole)));
                 });
@@ -65,6 +66,13 @@ namespace TimeTable.Api.Tests.Controllers.Base
 
                 await InitializeDbForTests(context, configuration, serviceProvider);
             }
+        }
+
+        protected HttpClient GetHttpClient(WebApplicationFactory<Startup> factory)
+        {
+            HttpClient client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add("x-api-key", "sRG35NXDCzu0Ip2eIuCVuguj21YQKNk6kboiW3s9Ps0q4eP3rVFLmXYsz5bq7613");
+            return client;
         }
 
         private async Task InitializeDbForTests(TimeTableDbContext context, IConfiguration configuration, IServiceProvider serviceProvider)

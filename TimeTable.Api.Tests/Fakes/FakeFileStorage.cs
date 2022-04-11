@@ -4,7 +4,7 @@ using TimeTable.Application.Contracts.Services;
 
 namespace TimeTable.Api.Tests.Fakes
 {
-    public class FakeFileStorage : IFileStorage
+    public class FakeFileStorage : IFileStorageService
     {
         public Task DeleteFileAsync(string container, string path)
         {

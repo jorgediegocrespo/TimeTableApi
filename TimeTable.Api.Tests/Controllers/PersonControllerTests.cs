@@ -28,7 +28,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -41,7 +41,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync($"{url}/items", content);
@@ -53,7 +53,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_PageSizeTooSortBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 0, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -66,7 +66,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_PageSizeTooLongBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 101, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -79,7 +79,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -92,7 +92,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetById_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1");
 
@@ -103,7 +103,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetById_NotFound()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1456");
 
@@ -115,7 +115,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1");
 
@@ -126,7 +126,8 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
+            client.DefaultRequestHeaders.Add("x-api-key", "sRG35NXDCzu0Ip2eIuCVuguj21YQKNk6kboiW3s9Ps0q4eP3rVFLmXYsz5bq7613");
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItem");
 
@@ -137,7 +138,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItem");
 
@@ -148,7 +149,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson 
             { 
@@ -168,7 +169,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync(url, content);
@@ -180,7 +181,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_NameBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson
             {
@@ -200,7 +201,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_RoleBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson
             {
@@ -219,7 +220,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_EmailBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson
             {
@@ -239,7 +240,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_PasswordBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson
             {
@@ -259,7 +260,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingPerson creatingPerson = new CreatingPerson
             {
@@ -281,7 +282,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPerson updatingPerson = new UpdatingPerson
             {
@@ -300,7 +301,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync(url, content);
@@ -312,7 +313,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_NameBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPerson updatingPerson = new UpdatingPerson
             {
@@ -331,7 +332,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Forbiden()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPerson updatingPerson = new UpdatingPerson
             {
@@ -350,7 +351,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Conflict()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -374,7 +375,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPerson creatingPerson = new UpdatingPerson
             {
@@ -402,7 +403,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task PutRole_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPersonRole updatingPerson = new UpdatingPersonRole
             {
@@ -420,7 +421,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task PutRole_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync($"{ url}/role", content);
@@ -432,7 +433,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task PutRole_RoleBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPersonRole updatingPerson = new UpdatingPersonRole
             {
@@ -451,7 +452,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task PutRole_Conflict()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -474,7 +475,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task PutRole_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             UpdatingPersonRole creatingPerson = new UpdatingPersonRole
             {
@@ -497,7 +498,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Delete_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -513,7 +514,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Delete_IsDefaultConflict()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.AdminId, RowVersion = PeopleInfo.AdminRowVersion };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");
@@ -529,7 +530,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Delete_Conflict()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -549,7 +550,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var person = await AddTestPerson(factory, timeTableContext);
 
@@ -564,7 +565,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task DeleteOwn_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -581,7 +582,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task DeleteOwn_Conflict()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             Random rnd = new Random();
             Byte[] rndRowVersion = new Byte[8];
@@ -599,7 +600,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task DeleteOwn_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             DeleteRequest deleteRequest = new DeleteRequest { Id = PeopleInfo.EmployeeId, RowVersion = PeopleInfo.EmployeeRowVersion };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(deleteRequest), Encoding.UTF8, "application/json");

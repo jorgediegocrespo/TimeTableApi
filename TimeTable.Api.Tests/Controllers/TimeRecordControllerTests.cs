@@ -24,7 +24,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -37,7 +37,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync($"{url}/items", content);
@@ -49,7 +49,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_PageSizeTooSortBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 0, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -62,7 +62,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_PageSizeTooLongBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 101, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -75,7 +75,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -88,7 +88,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -101,7 +101,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync($"{url}/ownItems", content);
@@ -113,7 +113,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_PageSizeTooSortBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 0, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -126,7 +126,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_PageSizeTooLongBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 101, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -139,7 +139,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task GetOwn_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             PaginationRequest pagination = new PaginationRequest { PageSize = 2, PageNumber = 1 };
             using StringContent content = new StringContent(JsonConvert.SerializeObject(pagination), Encoding.UTF8, "application/json");
@@ -153,7 +153,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1");
@@ -166,7 +166,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1456");
@@ -179,7 +179,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/items/1");
@@ -192,7 +192,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/1");
@@ -205,7 +205,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/1");
@@ -218,7 +218,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/1456");
@@ -231,7 +231,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             await AddTestTimeRecordsAsync(dbContextName);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/ownItems/2");
@@ -243,7 +243,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingTimeRecord creatingTimeRecord = new CreatingTimeRecord
             {
@@ -260,7 +260,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PostAsync(url, content);
@@ -273,7 +273,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             await timeTableContext.TimeRecords.AddAsync(new TimeRecordEntity()
             {
@@ -300,7 +300,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Post_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             CreatingTimeRecord creatingTimeRecord = new CreatingTimeRecord
             {
@@ -319,7 +319,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync(url, content);
@@ -331,7 +331,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(String.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync(url, content);
@@ -344,7 +344,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord = new TimeRecordEntity()
             {
@@ -374,7 +374,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord1 = new TimeRecordEntity()
             {
@@ -411,7 +411,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord1 = new TimeRecordEntity()
             {
@@ -441,7 +441,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, null);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord = new TimeRecordEntity()
             {
@@ -465,7 +465,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord = new TimeRecordEntity()
             {
@@ -489,7 +489,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             var timeRecord = new TimeRecordEntity()
             {

@@ -26,7 +26,7 @@ namespace TimeTable.Application.Tests.Services
         private readonly Mock<IPersonRepository> personRepositoryMock;
         private readonly Mock<IAppConfig> appConfigMock;
         private readonly Mock<IUserService> userServiceMock;
-        private readonly Mock<IFileStorage> fileStorageMock;
+        private readonly Mock<IFileStorageService> fileStorageMock;
 
         public PersonServiceTests()
         {
@@ -34,7 +34,7 @@ namespace TimeTable.Application.Tests.Services
             personRepositoryMock = new Mock<IPersonRepository>();
             appConfigMock = new Mock<IAppConfig>();
             userServiceMock = new Mock<IUserService>();
-            fileStorageMock = new Mock<IFileStorage>();
+            fileStorageMock = new Mock<IFileStorageService>();
         }
 
         [TestMethod]

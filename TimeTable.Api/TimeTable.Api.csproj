@@ -23,5 +23,10 @@
     <ProjectReference Include="..\TimeTable.CrossCutting\TimeTable.CrossCutting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\People\" />
+  </ItemGroup>
+
 
 </Project>

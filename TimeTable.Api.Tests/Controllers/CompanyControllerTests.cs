@@ -24,7 +24,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), null);
 
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using HttpResponseMessage response = await client.GetAsync($"{url}/item");
 
             Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -34,7 +34,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Get_Ok()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using HttpResponseMessage response = await client.GetAsync($"{url}/item");
             var result = JsonConvert.DeserializeObject<Company>(await response.Content.ReadAsStringAsync());
@@ -47,7 +47,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_Unauthorized()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.EMPLOYEE);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync(url, content);
@@ -59,7 +59,7 @@ namespace TimeTable.Api.Tests.Controllers
         public async Task Put_NullBadRequest()
         {
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(Guid.NewGuid().ToString(), RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
 
             using StringContent content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await client.PutAsync(url, content);
@@ -72,7 +72,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
             timeTableContext.ChangeTracker.Clear();
@@ -89,7 +89,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
             timeTableContext.ChangeTracker.Clear();
@@ -106,7 +106,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
             timeTableContext.ChangeTracker.Clear();
@@ -123,7 +123,7 @@ namespace TimeTable.Api.Tests.Controllers
         {
             string dbContextName = Guid.NewGuid().ToString();
             using WebApplicationFactory<Startup> factory = await BuildWebApplicationFactory(dbContextName, RolesConsts.ADMIN);
-            using HttpClient client = factory.CreateClient();
+            using HttpClient client = GetHttpClient(factory);
             using TimeTableDbContext timeTableContext = BuildContext(dbContextName);
             CompanyEntity companyEntity = timeTableContext.Companies.First();
             timeTableContext.ChangeTracker.Clear();

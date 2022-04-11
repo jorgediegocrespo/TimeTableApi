@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using TimeTable.Api.Attributes;
 using TimeTable.Api.Controllers.Base;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
@@ -13,6 +14,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/person")]
     [ApiController]
+    [ApiKey]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {

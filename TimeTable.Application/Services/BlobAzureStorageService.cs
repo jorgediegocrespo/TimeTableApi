@@ -8,11 +8,11 @@ using TimeTable.Application.Contracts.Services;
 
 namespace TimeTable.Application.Services
 {
-    public class BlobAzureStorage : IFileStorage
+    public class BlobAzureStorageService : IFileStorageService
     {
         private readonly string blobAzureConnectionString;
 
-        public BlobAzureStorage(IConfiguration configuration)
+        public BlobAzureStorageService(IConfiguration configuration)
         {
             blobAzureConnectionString = configuration.GetConnectionString("AzureStorage");
         }

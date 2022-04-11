@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using TimeTable.Api.Attributes;
 using TimeTable.Application.Contracts.Configuration;
 using TimeTable.Application.Contracts.Services;
 using TimeTable.Business.Models;
@@ -9,6 +10,7 @@ namespace TimeTable.Api.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [ApiKey]
     public class UserController : ControllerBase
     {
         private readonly IUserService service;

@@ -23,13 +23,13 @@ namespace TimeTable.Application.Services
 
         private readonly IPersonRepository repository;
         private readonly IUserService userService;
-        private readonly IFileStorage fileStorage;
+        private readonly IFileStorageService fileStorage;
 
         public PersonService(IUnitOfWork unitOfWork,
                              IPersonRepository repository,
                              IAppConfig appConfig,
                              IUserService userService,
-                             IFileStorage fileStorage)
+                             IFileStorageService fileStorage)
             : base(unitOfWork, appConfig)
         {
             this.repository = repository;
@@ -93,7 +93,7 @@ namespace TimeTable.Application.Services
 
                 PersonEntity entityToUpdate = await repository.AttachAsync(businessModel.Id, businessModel.RowVersion);
                 MapUpdating(entityToUpdate, businessModel);
-                entity.PictureUrl = await fileStorage.UpdateFileAsync(businessModel.Picture, PERSON_PICTURE_EXTENSION, PERSON_PICTURE_CONTAINER, entity.PictureUrl, PERSON_PICTURE_CONTENT_TYPE);
+                entityToUpdate.PictureUrl = await fileStorage.UpdateFileAsync(businessModel.Picture, PERSON_PICTURE_EXTENSION, PERSON_PICTURE_CONTAINER, entity.PictureUrl, PERSON_PICTURE_CONTENT_TYPE);
 
                 await unitOfWork.SaveChangesAsync();
             });
